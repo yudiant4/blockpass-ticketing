@@ -1,0 +1,30 @@
+{
+  "name": "ticketpro",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "panda codegen && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prepare": "panda codegen"
+  },
+  "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.11",
+    "@tanstack/react-query": "^5.101.4",
+    "@x402/evm": "^2.22.0",
+    "@x402/svm": "^2.22.0",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "viem": "^2.55.11",
+    "wagmi": "~2.19.5"
+  },
+  "devDependencies": {
+    "@pandacss/dev": "^0.38.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}
