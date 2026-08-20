@@ -3,28 +3,39 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useWriteContract, useWaitForTransactionReceipt, useAccount, useChainId, useSwitchChain } from 'wagmi';
+import { parseEther } from 'viem';
 import { css } from '../../../styled-system/css';
 import { BLOCKPASS_ABI } from '../../lib/blockpass';
 import { getContractAddress, getChainName } from '../../config/contracts';
 
+// ERC-1155 tiers: tokenId -> { price (wei per ticket), symbol }
 const ticketTiers = [
     {
-        name: 'VIP PASS',
-        price: '0.01 ETH',
-        fiat: 'Rp 500.000',
-        benefits: ['Akses Backstage Eksklusif', 'Free Merchandise NFT & Fisik', 'Drink Coupon & VIP Lounge'],
-    },
-    {
-        name: 'EARLY BIRD',
-        price: '0.003 ETH',
-        fiat: 'Rp 150.000',
-        benefits: ['Akses Masuk Utama Event', 'Digital POAP Finisher Badge'],
-    },
-    {
-        name: 'GENERAL ADMISSION',
-        price: '0.005 ETH',
-        fiat: 'Rp 250.000',
+        id: 1,
+        name: 'REGULAR',
+        price: '0.001 ETH',
+        eth: '0.001',
+        fiat: 'Rp 50.000',
+        supply: 1000,
         benefits: ['Akses Masuk Area Umum', 'Standard Digital Ticket NFT'],
+    },
+    {
+        id: 2,
+        name: 'VIP',
+        price: '0.003 ETH',
+        eth: '0.003',
+        fiat: 'Rp 150.000',
+        supply: 500,
+        benefits: ['Akses Masuk Utama Event', 'Digital POAP Finisher Badge', 'Free Merchandise NFT'],
+    },
+    {
+        id: 3,
+        name: 'VVIP',
+        price: '0.01 ETH',
+        eth: '0.01',
+        fiat: 'Rp 500.000',
+        supply: 100,
+        benefits: ['Akses Backstage Eksklusif', 'Free Merchandise NFT & Fisik', 'Drink Coupon & VIP Lounge', 'Front Row Seat'],
     },
 ];
 
@@ -62,12 +73,16 @@ export default function EventDetailPage() {
         }
 
         const tier = ticketTiers[selectedTier];
+        const amount = 1;
+        const totalWei = parseEther(tier.eth) * BigInt(amount);
+
         writeContract(
             {
                 address: contractAddr,
                 abi: BLOCKPASS_ABI,
                 functionName: 'mintTicket',
-                args: [BigInt(1), tier.name, 'Pacet, Mojokerto, East Java', '2026-08-15', `https://blockpass.app/token/${tier.name.toLowerCase().replace(/\s+/g, '-')}.json`],
+                args: [BigInt(tier.id), BigInt(amount)],
+                value: totalWei,
             },
             { onSuccess: (h) => setMintHash(h) }
         );
