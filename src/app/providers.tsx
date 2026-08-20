@@ -12,7 +12,7 @@ import {
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { WagmiProvider, createConfig, http } from 'wagmi';
-import { sepolia, mainnet, foundry } from 'wagmi/chains';
+import { sepolia, baseSepolia } from 'wagmi/chains';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -37,15 +37,13 @@ const connectors = connectorsForWallets(
 );
 
 const sepoliaRpc = process.env.NEXT_PUBLIC_SEPOLIA_RPC || 'https://ethereum-sepolia-rpc.publicnode.com';
-const forkRpc = process.env.NEXT_PUBLIC_FORK_RPC;
 
 export const config = createConfig({
   connectors,
-  chains: [sepolia, foundry, mainnet],
+  chains: [sepolia, baseSepolia],
   transports: {
-    [sepolia.id]: http(forkRpc ?? sepoliaRpc),
-    [foundry.id]: http(),
-    [mainnet.id]: http(),
+    [sepolia.id]: http(sepoliaRpc),
+    [baseSepolia.id]: http('https://sepolia.base.org'),
   },
   ssr: true,
 });

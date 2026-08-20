@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { css } from '../../../styled-system/css';
-import { BLOCKPASS_ADDRESS, BLOCKPASS_ABI } from '../../lib/blockpass';
+import { BLOCKPASS_ABI } from '../../lib/blockpass';
+import { getContractAddress, getChainName } from '../../config/contracts';
 
 const ticketTiers = [
     {
@@ -33,14 +34,37 @@ export default function EventDetailPage() {
     const [selectedTier, setSelectedTier] = useState(0);
     const [mintHash, setMintHash] = useState<string | null>(null);
 
+    const { address, isConnected } = useAccount();
+    const chainId = useChainId();
+    const { switchChain } = useSwitchChain();
     const { writeContract, isPending, error } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: mintHash as `0x${string}` | undefined });
 
-    const mintTicket = () => {
+    // Contract address for current chain
+    const contractAddr = getContractAddress(chainId);
+    const networkName = getChainName(chainId);
+    const isSupportedNetwork = !!contractAddr;
+    const isWrongNetwork = isConnected && !isSupportedNetwork;
+
+    const handleMint = async () => {
+        if (!isConnected) {
+            return alert('Hubungkan wallet terlebih dahulu');
+        }
+
+        if (isWrongNetwork) {
+            const targetChainId = 11155111; // Sepolia
+            await switchChain({ chainId: targetChainId });
+            return;
+        }
+
+        if (!contractAddr) {
+            return alert(`Jaringan ${networkName || chainId} tidak didukung. Gunakan Sepolia atau Base Sepolia.`);
+        }
+
         const tier = ticketTiers[selectedTier];
         writeContract(
             {
-                address: BLOCKPASS_ADDRESS,
+                address: contractAddr,
                 abi: BLOCKPASS_ABI,
                 functionName: 'mintTicket',
                 args: [BigInt(1), tier.name, 'Pacet, Mojokerto, East Java', '2026-08-15', `https://blockpass.app/token/${tier.name.toLowerCase().replace(/\s+/g, '-')}.json`],
@@ -166,12 +190,25 @@ export default function EventDetailPage() {
                                 </div>
 
                                 <button
-                                    onClick={mintTicket}
+                                    onClick={handleMint}
                                     disabled={isPending || isConfirming}
                                     className={css({ width: '100%', padding: '14px', background: 'neon', color: 'bg', fontFamily: 'mono', fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', border: 'none', cursor: 'pointer', _disabled: { opacity: 0.6, cursor: 'not-allowed' } })}
                                 >
-                                    {isConfirming ? 'Confirming…' : isPending ? 'Check Wallet…' : `Mint ${ticketTiers[selectedTier].name}`}
+                                    {isConfirming
+                                        ? 'Confirming…'
+                                        : isPending
+                                        ? 'Check Wallet…'
+                                        : !isConnected
+                                        ? 'Hubungkan Wallet'
+                                        : isWrongNetwork
+                                        ? `Switch ke ${getChainName(11155111) || 'Sepolia'}`
+                                        : `Mint ${ticketTiers[selectedTier].name}`}
                                 </button>
+                                {isWrongNetwork && (
+                                    <div className={css({ marginTop: '8px', padding: '10px', background: 'rgba(255,200,0,0.1)', border: '1px solid rgba(255,200,0,0.3)', fontFamily: 'mono', fontSize: '10px', color: '#facc15', textAlign: 'center' })}>
+                                        ⚠️ Wallet di jaringan tidak didukung ({networkName || chainId}). Klik tombol di atas untuk switch ke Sepolia.
+                                    </div>
+                                )}
                                 {mintHash && (
                                     <div className={css({ marginTop: '12px', fontFamily: 'mono', fontSize: '10px', color: isSuccess ? 'neon' : 'muted', wordBreak: 'break-all' })}>
                                         {isSuccess ? `✅ Minted! Tx: ${mintHash}` : `Tx pending: ${mintHash}`}
