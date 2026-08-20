@@ -66,7 +66,8 @@ export default function EventDetailPage() {
         }
 
         if (isWrongNetwork) {
-            // Kontrak ERC-1155 hanya di Base Sepolia (84532)
+            // Kontrak tersedia di Sepolia (11155111) & Base Sepolia (84532).
+            // Default switch ke Base Sepolia.
             const targetChainId = 84532;
             await switchChain({ chainId: targetChainId });
             return;

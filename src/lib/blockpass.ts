@@ -3,11 +3,9 @@
 import { getAddress, type Abi } from 'viem';
 import abi from '../contracts/BlockpassTicketAbi.json';
 
-// Contract address: Base Sepolia deployment of BlockpassTicket (ERC-1155)
-// Override via NEXT_PUBLIC_CONTRACT_BASE_SEPOLIA or NEXT_PUBLIC_BLOCKPASS_ADDRESS
+// Base Sepolia deployment (default fallback)
 export const BLOCKPASS_ADDRESS = getAddress(
   process.env.NEXT_PUBLIC_CONTRACT_BASE_SEPOLIA ||
-    process.env.NEXT_PUBLIC_BLOCKPASS_ADDRESS ||
     '0xbdb5f9745Db186C25424fA0EC5b81009980B87c2'
 );
 

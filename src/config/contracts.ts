@@ -20,10 +20,9 @@ const chainConfigs: Record<SupportedChainId, ChainConfig> = {
     id: 11155111,
     name: 'Sepolia',
     shortName: 'Sepolia',
-    // ERC-1155 BlockpassTicket BELUM di-deploy ke Sepolia.
-    // Set NEXT_PUBLIC_CONTRACT_SEPOLIA setelah deploy ke sana.
     contractAddress: getAddress(
-      process.env.NEXT_PUBLIC_CONTRACT_SEPOLIA || '0x0000000000000000000000000000000000000000'
+      process.env.NEXT_PUBLIC_CONTRACT_SEPOLIA ||
+        '0xec89a924cfb0116b32e3b795ef4f2ddd8bdf66e7'
     ),
     blockExplorer: 'https://sepolia.etherscan.io',
   },
