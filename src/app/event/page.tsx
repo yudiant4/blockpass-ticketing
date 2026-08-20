@@ -51,10 +51,13 @@ export default function EventDetailPage() {
     const { writeContract, isPending, error } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: mintHash as `0x${string}` | undefined });
 
-    // Contract address for current chain
+    const isZeroAddress = (addr: `0x${string}` | undefined) =>
+    !addr || addr === '0x0000000000000000000000000000000000000000';
+
+// Contract address for current chain
     const contractAddr = getContractAddress(chainId);
     const networkName = getChainName(chainId);
-    const isSupportedNetwork = !!contractAddr;
+    const isSupportedNetwork = !!contractAddr && !isZeroAddress(contractAddr);
     const isWrongNetwork = isConnected && !isSupportedNetwork;
 
     const handleMint = async () => {
@@ -63,7 +66,8 @@ export default function EventDetailPage() {
         }
 
         if (isWrongNetwork) {
-            const targetChainId = 11155111; // Sepolia
+            // Kontrak ERC-1155 hanya di Base Sepolia (84532)
+            const targetChainId = 84532;
             await switchChain({ chainId: targetChainId });
             return;
         }
