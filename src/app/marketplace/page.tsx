@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { css } from '../../../styled-system/css';
 
@@ -14,8 +14,8 @@ const marketplaceEvents = [
         location: 'Pacet, Mojokerto',
         date: 'Aug 15, 2026',
         network: 'Ethereum',
-        cryptoPrice: '0.15 ETH',
-        fiatPrice: 'Rp 7.500.000',
+        cryptoPrice: '0.005 ETH',
+        fiatPrice: 'Rp 250.000',
         status: 'Live Minting',
         statusColor: 'neon',
         supply: { minted: 85, total: 150 },
@@ -32,8 +32,8 @@ const marketplaceEvents = [
         location: 'Jakarta, Indonesia',
         date: 'Sep 22, 2026',
         network: 'Base',
-        cryptoPrice: '0.05 ETH',
-        fiatPrice: 'Rp 2.500.000',
+        cryptoPrice: '0.002 ETH',
+        fiatPrice: 'Rp 100.000',
         status: 'Live Minting',
         statusColor: 'neon',
         supply: { minted: 420, total: 500 },
@@ -51,7 +51,7 @@ const marketplaceEvents = [
         date: 'Oct 10, 2026',
         network: 'Polygon',
         cryptoPrice: '50 MATIC',
-        fiatPrice: 'Rp 650.000',
+        fiatPrice: 'Rp 250.000',
         status: 'Selling Fast',
         statusColor: 'neon3',
         supply: { minted: 890, total: 1000 },
@@ -68,8 +68,8 @@ const marketplaceEvents = [
         location: 'Lombok, NTB',
         date: 'Nov 01, 2026',
         network: 'Ethereum',
-        cryptoPrice: '0.25 ETH',
-        fiatPrice: 'Rp 12.500.000',
+        cryptoPrice: '0.01 ETH',
+        fiatPrice: 'Rp 500.000',
         status: 'Upcoming',
         statusColor: 'neon2',
         supply: { minted: 0, total: 50 },
@@ -104,14 +104,122 @@ const marketplaceEvents = [
         location: 'Jakarta, Indonesia',
         date: 'Aug 28, 2026',
         network: 'Base',
-        cryptoPrice: '0.02 ETH',
-        fiatPrice: 'Rp 1.000.000',
+        cryptoPrice: '0.001 ETH',
+        fiatPrice: 'Rp 50.000',
         status: 'Live Minting',
         statusColor: 'neon',
         supply: { minted: 150, total: 1000 },
         rarity: 'General Admission',
         action: 'Mint Now',
         bg: 'linear-gradient(135deg, #0d2d2d 0%, #1a3030 100%)',
+        trending: false,
+    },
+    {
+        id: 7,
+        title: 'JAVA HIKING COMMUNITY MEETUP',
+        organizer: 'Trekker DAO',
+        category: 'Festival',
+        location: 'Bogor, West Java',
+        date: 'Sep 05, 2026',
+        network: 'Ethereum',
+        cryptoPrice: '0.001 ETH',
+        fiatPrice: 'Rp 50.000',
+        status: 'Live Minting',
+        statusColor: 'neon',
+        supply: { minted: 30, total: 100 },
+        rarity: 'General Admission',
+        action: 'Mint Now',
+        bg: 'linear-gradient(135deg, #0f2d0d 0%, #1a3030 100%)',
+        trending: false,
+    },
+    {
+        id: 8,
+        title: 'NFT ART JAKARTA EXPO',
+        organizer: 'OtakuVerse',
+        category: 'Exhibition',
+        location: 'Jakarta, Indonesia',
+        date: 'Oct 02, 2026',
+        network: 'Base',
+        cryptoPrice: '0.0015 ETH',
+        fiatPrice: 'Rp 75.000',
+        status: 'Upcoming',
+        statusColor: 'neon2',
+        supply: { minted: 0, total: 300 },
+        rarity: 'Early Bird',
+        action: 'Join Whitelist',
+        bg: 'linear-gradient(135deg, #1a0f2d 0%, #2d1a30 100%)',
+        trending: true,
+    },
+    {
+        id: 9,
+        title: 'BANDUNG INDIE MUSIC FEST',
+        organizer: 'Electronic Horizon',
+        category: 'Konser',
+        location: 'Bandung, West Java',
+        date: 'Oct 18, 2026',
+        network: 'Polygon',
+        cryptoPrice: '30 MATIC',
+        fiatPrice: 'Rp 100.000',
+        status: 'Live Minting',
+        statusColor: 'neon',
+        supply: { minted: 210, total: 800 },
+        rarity: 'Tier 1',
+        action: 'Mint Now',
+        bg: 'linear-gradient(135deg, #2d0f1a 0%, #1a0f2e 100%)',
+        trending: false,
+    },
+    {
+        id: 10,
+        title: 'BALI SUNSET YOGA RETREAT',
+        organizer: 'Mojokerto Extreme',
+        category: 'Festival',
+        location: 'Uluwatu, Bali',
+        date: 'Nov 14, 2026',
+        network: 'Ethereum',
+        cryptoPrice: '0.004 ETH',
+        fiatPrice: 'Rp 200.000',
+        status: 'Upcoming',
+        statusColor: 'neon2',
+        supply: { minted: 0, total: 200 },
+        rarity: 'VIP Pass',
+        action: 'Join Whitelist',
+        bg: 'linear-gradient(135deg, #1f1c0d 0%, #302b1a 100%)',
+        trending: true,
+    },
+    {
+        id: 11,
+        title: 'SURABAYA STREET FOOD FEST',
+        organizer: 'Gaming Guild',
+        category: 'Festival',
+        location: 'Surabaya, East Java',
+        date: 'Sep 26, 2026',
+        network: 'Base',
+        cryptoPrice: '0.001 ETH',
+        fiatPrice: 'Rp 50.000',
+        status: 'Selling Fast',
+        statusColor: 'neon3',
+        supply: { minted: 450, total: 500 },
+        rarity: 'General Admission',
+        action: 'Buy on Secondary',
+        bg: 'linear-gradient(135deg, #0d2d1a 0%, #1a3030 100%)',
+        trending: false,
+    },
+    {
+        id: 12,
+        title: 'WEB3 DEV HACKATHON 2026',
+        organizer: 'Talus Network',
+        category: 'Konferensi',
+        location: 'Yogyakarta, Indonesia',
+        date: 'Dec 05, 2026',
+        network: 'Ethereum',
+        cryptoPrice: '0.0015 ETH',
+        fiatPrice: 'Rp 75.000',
+        status: 'Live Minting',
+        statusColor: 'neon',
+        supply: { minted: 89, total: 200 },
+        rarity: 'Hacker Pass',
+        action: 'Mint Now',
+        bg: 'linear-gradient(135deg, #0d1f2d 0%, #1a2030 100%)',
         trending: false,
     },
 ];
@@ -133,6 +241,14 @@ export default function MarketplacePage() {
     });
 
     const trendingEvents = marketplaceEvents.filter(ev => ev.trending);
+
+    // ===== PAGINATION =====
+    const PAGE_SIZE = 6;
+    const [page, setPage] = useState(1);
+    useEffect(() => { setPage(1); }, [searchQuery, category, status, network, sort]);
+    const totalPages = Math.max(1, Math.ceil(filteredEvents.length / PAGE_SIZE));
+    const currentPage = Math.min(page, totalPages);
+    const paginatedEvents = filteredEvents.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     return (
         <main className={css({ minHeight: '100vh', paddingTop: '100px', paddingBottom: '100px' })}>
@@ -214,7 +330,7 @@ export default function MarketplacePage() {
 
                 {/* Grid Card Tiket (NFT Cards) */}
                 <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: '24px' })}>
-                    {filteredEvents.map((ev) => (
+                    {paginatedEvents.map((ev) => (
                         <Link href={`/event`} key={ev.id} className={css({ textDecoration: 'none', color: 'inherit' })}>
                             <div className={css({ background: 'card', border: '1px solid token(colors.border)', transition: 'all 0.3s', cursor: 'pointer', _hover: { transform: 'translateY(-6px)', borderColor: 'neon', boxShadow: '0 15px 30px rgba(0,0,0,0.5)' } })}>
 
@@ -286,6 +402,42 @@ export default function MarketplacePage() {
                         </div>
                     )}
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className={css({ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '48px', flexWrap: 'wrap' })}>
+                        <button
+                            onClick={() => setPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className={css({ padding: '10px 16px', background: 'surface', border: '1px solid token(colors.border)', color: currentPage === 1 ? 'muted' : 'text', fontFamily: 'mono', fontSize: '11px', textTransform: 'uppercase', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', transition: 'all 0.2s', _hover: currentPage !== 1 ? { borderColor: 'neon', color: 'neon' } : {} })}
+                        >
+                            ← Prev
+                        </button>
+
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                            <button
+                                key={p}
+                                onClick={() => setPage(p)}
+                                className={css({
+                                    width: '40px', height: '40px', background: p === currentPage ? 'neon' : 'surface',
+                                    border: '1px solid token(colors.border)', color: p === currentPage ? 'bg' : 'text',
+                                    fontFamily: 'mono', fontSize: '12px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s',
+                                    _hover: p !== currentPage ? { borderColor: 'neon', color: 'neon' } : {}
+                                })}
+                            >
+                                {p}
+                            </button>
+                        ))}
+
+                        <button
+                            onClick={() => setPage(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className={css({ padding: '10px 16px', background: 'surface', border: '1px solid token(colors.border)', color: currentPage === totalPages ? 'muted' : 'text', fontFamily: 'mono', fontSize: '11px', textTransform: 'uppercase', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', transition: 'all 0.2s', _hover: currentPage !== totalPages ? { borderColor: 'neon', color: 'neon' } : {} })}
+                        >
+                            Next →
+                        </button>
+                    </div>
+                )}
 
             </div>
         </main>

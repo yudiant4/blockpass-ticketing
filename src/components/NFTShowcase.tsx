@@ -5,7 +5,7 @@ const nfts = [
     {
         name: 'VIP FLOOR #0042',
         event: 'ELECTRONIC HORIZON FESTIVAL',
-        price: '0.45 ETH',
+        price: '0.015 ETH',
         badge: 'Legendary',
         badgeClass: css({ borderColor: 'neon3', color: 'neon3' }),
         pass: 'VIP PASS',
@@ -16,7 +16,7 @@ const nfts = [
     {
         name: '42K ULTRA #1088',
         event: 'ALAS TRAIL RUN 2026',
-        price: '0.15 ETH',
+        price: '0.005 ETH',
         badge: 'VIP Pass',
         badgeClass: css({ borderColor: 'neon', color: 'neon' }),
         pass: '42K ULTRA',
@@ -27,7 +27,7 @@ const nfts = [
     {
         name: 'SUMMIT PASS #0422',
         event: 'RINJANI EXPEDITION VIP',
-        price: '0.25 ETH',
+        price: '0.01 ETH',
         badge: 'Legendary',
         badgeClass: css({ borderColor: 'neon3', color: 'neon3' }),
         pass: 'EXPEDITION',
@@ -37,7 +37,7 @@ const nfts = [
     {
         name: 'FRONT ROW #0118',
         event: 'NEON CITY RAVE VOL. 3',
-        price: '0.18 ETH',
+        price: '0.006 ETH',
         badge: 'Epic',
         badgeClass: css({ borderColor: 'neon2', color: 'neon2' }),
         pass: 'SECTION A',
@@ -47,7 +47,7 @@ const nfts = [
     {
         name: 'ALL ACCESS #0012',
         event: 'TALUS WEB3 SUMMIT',
-        price: '0.05 ETH',
+        price: '0.002 ETH',
         badge: 'Tier 1',
         badgeClass: css({ borderColor: 'neon', color: 'neon' }),
         pass: 'ALL ACCESS',
@@ -67,7 +67,7 @@ const nfts = [
     {
         name: 'MAIN STAGE #0150',
         event: 'MANTRA 116 ULTRA',
-        price: '0.20 ETH',
+        price: '0.008 ETH',
         badge: 'Epic',
         badgeClass: css({ borderColor: 'neon2', color: 'neon2' }),
         pass: '116K PASS',
@@ -77,7 +77,7 @@ const nfts = [
     {
         name: 'VIP ARENA #0007',
         event: 'BLOCKPASS ESPORTS ARENA',
-        price: '0.02 ETH',
+        price: '0.001 ETH',
         badge: 'VIP Pass',
         badgeClass: css({ borderColor: 'neon', color: 'neon' }),
         pass: 'ESPORTS VIP',

@@ -9,20 +9,20 @@ import { BLOCKPASS_ADDRESS, BLOCKPASS_ABI } from '../../lib/blockpass';
 const ticketTiers = [
     {
         name: 'VIP PASS',
-        price: '0.25 ETH',
-        fiat: 'Rp 12.500.000',
+        price: '0.01 ETH',
+        fiat: 'Rp 500.000',
         benefits: ['Akses Backstage Eksklusif', 'Free Merchandise NFT & Fisik', 'Drink Coupon & VIP Lounge'],
     },
     {
         name: 'EARLY BIRD',
-        price: '0.10 ETH',
-        fiat: 'Rp 5.000.000',
+        price: '0.003 ETH',
+        fiat: 'Rp 150.000',
         benefits: ['Akses Masuk Utama Event', 'Digital POAP Finisher Badge'],
     },
     {
         name: 'GENERAL ADMISSION',
-        price: '0.15 ETH',
-        fiat: 'Rp 7.500.000',
+        price: '0.005 ETH',
+        fiat: 'Rp 250.000',
         benefits: ['Akses Masuk Area Umum', 'Standard Digital Ticket NFT'],
     },
 ];
