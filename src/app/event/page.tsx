@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { css } from '../../../styled-system/css';
-import EventDayTicket from '../../components/EventDayTicket';
+import dynamic from 'next/dynamic';
+
+const EventDayTicket = dynamic(() => import('../../components/EventDayTicket'), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center h-64">Loading...</div>,
+});
 
 // ERC-1155 tiers: tokenId -> { price (wei per ticket), symbol }
 const ticketTiers = [
