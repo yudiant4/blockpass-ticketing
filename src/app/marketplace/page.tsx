@@ -271,8 +271,7 @@ export default function MarketplacePage() {
                     </div>
                     <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', lg: 'repeat(3, 1fr)' }, gap: '20px' })}>
                         {trendingEvents.map(ev => (
-                            <Link key={`trend-${ev.id}`} href="/event" className={css({ textDecoration: 'none', color: 'inherit' })}>
-                                <div className={css({ background: 'card', border: '1px solid token(colors.neon)', padding: '20px', position: 'relative', overflow: 'hidden', transition: 'transform 0.3s', _hover: { transform: 'translateY(-4px)', boxShadow: '0 10px 30px rgba(0,245,196,0.15)' } })}>
+                            <Link key={`trend-${ev.id}`} href={`/event/${ev.id}`} className={css({ textDecoration: 'none', color: 'inherit' })}>\n                                <div className={css({ background: 'card', border: '1px solid token(colors.neon)', padding: '20px', position: 'relative', overflow: 'hidden', transition: 'transform 0.3s', _hover: { transform: 'translateY(-4px)', boxShadow: '0 10px 30px rgba(0,245,196,0.15)' } })}>
                                     <div className={css({ position: 'absolute', top: 0, right: 0, width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(0,245,196,0.2) 0%, transparent 70%)', filter: 'blur(20px)' })}></div>
                                     <h3 className={css({ fontSize: '18px', fontWeight: '800', marginBottom: '4px', color: 'white' })}>{ev.title}</h3>
                                     <p className={css({ fontFamily: 'mono', fontSize: '10px', color: 'neon' })}>{ev.cryptoPrice} • {ev.network}</p>
@@ -331,7 +330,7 @@ export default function MarketplacePage() {
                 {/* Grid Card Tiket (NFT Cards) */}
                 <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: '24px' })}>
                     {paginatedEvents.map((ev) => (
-                        <Link href={`/event`} key={ev.id} className={css({ textDecoration: 'none', color: 'inherit' })}>
+                        <Link href={`/event/${ev.id}`} key={ev.id} className={css({ textDecoration: 'none', color: 'inherit' })}>\n
                             <div className={css({ background: 'card', border: '1px solid token(colors.border)', transition: 'all 0.3s', cursor: 'pointer', _hover: { transform: 'translateY(-6px)', borderColor: 'neon', boxShadow: '0 15px 30px rgba(0,0,0,0.5)' } })}>
 
                                 {/* Visual NFT / Tiket */}
