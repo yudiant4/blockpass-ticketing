@@ -3,192 +3,181 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { css } from '../../../../styled-system/css';
 import dynamic from 'next/dynamic';
-
-// Wagmi & Viem untuk baca saldo tiket di-chain
-import { useAccount, useReadContract, useChainId } from 'wagmi';
-import { BLOCKPASS_ABI } from '../../../lib/blockpass';
-import { getContractAddress } from '../../../config/contracts';
 
 const EventDayTicket = dynamic(() => import('../../../components/EventDayTicket'), {
   ssr: false,
-  loading: () => <div className="flex items-center justify-center h-64 text-mint-green">Loading Gate...</div>,
+  loading: () => (
+    <div className="flex items-center justify-center h-64 text-cyan-400 font-mono text-xs uppercase tracking-widest">
+      // Loading Gate...
+    </div>
+  ),
 });
+
+const ticketTiers = [
+  {
+    id: 1,
+    name: 'REGULAR',
+    price: '0.001 ETH',
+    network: 'Ethereum',
+    statusColor: 'cyan',
+  },
+  {
+    id: 2,
+    name: 'VIP',
+    price: '0.003 ETH',
+    network: 'Ethereum',
+    statusColor: 'cyan',
+  },
+  {
+    id: 3,
+    name: 'VVIP',
+    price: '0.01 ETH',
+    network: 'Ethereum',
+    statusColor: 'emerald',
+  },
+];
 
 export default function EventDynamicPage() {
   const params = useParams();
   const eventId = params?.id ? parseInt(params.id as string, 10) : 1;
 
-  // Wallet & Chain
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
-  const contractAddress = getContractAddress(chainId) || '0xbdb5f9745Db186C25424fA0EC5b81009980B87c2';
-
-  // --- LOGIKA GATED CONTENT (CEK BALANSER TIKET IN-CHAIN) ---
-  // Cek apakah user punya minimal 1 tiket di tier apapun (REGULAR=1, VIP=2, VVIP=3)
-  const { data: regularBalance } = useReadContract({
-    address: contractAddress as `0x${string}`,
-    abi: BLOCKPASS_ABI,
-    functionName: 'balanceOf',
-    args: address ? [address, BigInt(1)] : undefined,
-  });
-
-  const { data: vipBalance } = useReadContract({
-    address: contractAddress as `0x${string}`,
-    abi: BLOCKPASS_ABI,
-    functionName: 'balanceOf',
-    args: address ? [address, BigInt(2)] : undefined,
-  });
-
-  const { data: vvipBalance } = useReadContract({
-    address: contractAddress as `0x${string}`,
-    abi: BLOCKPASS_ABI,
-    functionName: 'balanceOf',
-    args: address ? [address, BigInt(3)] : undefined,
-  });
-
-  // User dianggap MEMILIKI TIKET jika saldo di salah satu tier > 0
-  const hasTicket = 
-    (Number(regularBalance || 0) > 0) ||
-    (Number(vipBalance || 0) > 0) ||
-    (Number(vvipBalance || 0) > 0);
-
-  // Tab State: 'pre' (Pre-Event/Mint) | 'day' (Event Day/QR) | 'post' (Post-Event/POAP)
   const [activeTab, setActiveTab] = useState<'pre' | 'day' | 'post'>('pre');
+  const [selectedTier, setSelectedTier] = useState<number>(2);
 
   return (
-    <main className={css({ minHeight: '100vh', paddingTop: '100px', paddingBottom: '120px', bg: 'slate.900' })}>
-      <div className="max-w-4xl mx-auto px-4 text-slate-100">
-        
-        {/* TAB NAVIGATION DENGAN LOGIKA LOCK */}
-        <div className="flex justify-center gap-4 mb-8 bg-slate-800/60 p-2 rounded-xl border border-slate-700">
-          <button
-            onClick={() => setActiveTab('pre')}
-            className={`px-6 py-2.5 rounded-lg font-mono text-xs font-bold transition-all ${
-              activeTab === 'pre'
-                ? 'bg-mint-green text-slate-900 shadow-[0_0_15px_rgba(0,255,163,0.3)]'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            1. PRE-EVENT (MINT)
-          </button>
-
-          {/* TAB EVENT DAY (LOCKED JIKA BELUM PUNYA TIKET) */}
-          <button
-            onClick={() => {
-              if (hasTicket) setActiveTab('day');
-              else alert('🔒 Akses Terkunci! Anda harus membeli/mint tiket terlebih dahulu.');
-            }}
-            className={`px-6 py-2.5 rounded-lg font-mono text-xs font-bold flex items-center gap-2 transition-all ${
-              activeTab === 'day'
-                ? 'bg-mint-green text-slate-900 shadow-[0_0_15px_rgba(0,255,163,0.3)]'
-                : hasTicket
-                ? 'text-slate-400 hover:text-white cursor-pointer'
-                : 'text-slate-600 bg-slate-900/50 cursor-not-allowed border border-slate-800'
-            }`}
-          >
-            {!hasTicket && <span>🔒</span>}
-            2. EVENT DAY (GATE)
-          </button>
-
-          {/* TAB POST-EVENT (LOCKED JIKA BELUM PUNYA TIKET) */}
-          <button
-            onClick={() => {
-              if (hasTicket) setActiveTab('post');
-              else alert('🔒 Akses Terkunci! Anda harus membeli/mint tiket terlebih dahulu.');
-            }}
-            className={`px-6 py-2.5 rounded-lg font-mono text-xs font-bold flex items-center gap-2 transition-all ${
-              activeTab === 'post'
-                ? 'bg-purple-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)]'
-                : hasTicket
-                ? 'text-slate-400 hover:text-white cursor-pointer'
-                : 'text-slate-600 bg-slate-900/50 cursor-not-allowed border border-slate-800'
-            }`}
-          >
-            {!hasTicket && <span>🔒</span>}
-            3. POST-EVENT (POAP)
-          </button>
+    <main
+      className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgba(34,211,238,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.05) 1px, transparent 1px)',
+        backgroundSize: '32px 32px',
+      }}
+    >
+      <div className="relative z-10 max-w-4xl mx-auto px-4 py-24">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="inline-block px-3 py-1 border border-cyan-500/40 rounded-md font-mono text-[10px] uppercase tracking-[0.3em] text-cyan-400 mb-4">
+            Event #{eventId} • NFT Ticketing
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold uppercase text-white tracking-wide">
+            ALAS TRAIL RUN <span className="text-cyan-400">2026</span>
+          </h1>
+          <p className="mt-3 text-slate-400 text-sm font-mono">
+            Pacet, Mojokerto • <span className="text-emerald-400">Aug 15, 2026</span>
+          </p>
         </div>
 
-        {/* --- TAMPILAN 1: PRE-EVENT (MINT TIKET) --- */}
-        {activeTab === 'pre' && (
-          <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-6 text-center space-y-6">
-            <h2 className="text-2xl font-bold text-mint-green">Mint Tiket Acara</h2>
-            <p className="text-slate-400 text-sm">Pilih tier dan selesaikan transaksi untuk membuka akses Event Day & Gate Pass.</p>
-            
-            {/* Indikator jika user sudah punya tiket */}
-            {hasTicket && (
-              <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl text-green-400 text-sm font-mono flex items-center justify-center gap-2">
-                <span>✅</span> Anda sudah memiliki tiket! Tab <strong>Event Day (Gate)</strong> & <strong>Post-Event</strong> sekarang terbuka.
-              </div>
-            )}
+        {/* Tab Navigation */}
+        <div className="flex justify-center gap-3 mb-8 p-2 bg-slate-900/80 border border-cyan-500/40 rounded-xl backdrop-blur">
+          {[
+            { key: 'pre', label: '01 // PRE-EVENT' },
+            { key: 'day', label: '02 // EVENT DAY' },
+            { key: 'post', label: '03 // POST-EVENT' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as 'pre' | 'day' | 'post')}
+              className={`flex-1 px-4 py-2.5 rounded-lg font-mono text-[11px] font-bold uppercase tracking-widest transition-all ${
+                activeTab === tab.key
+                  ? 'bg-cyan-500 text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.4)]'
+                  : 'bg-slate-950/60 text-slate-400 border border-cyan-500/20 hover:text-cyan-400 hover:border-cyan-500/60'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-            <div className="p-8 bg-slate-900/80 rounded-xl border border-slate-700 text-slate-300">
-              <p className="font-mono text-xs text-mint-green mb-4">// TIER SELECTION & MINT FORM</p>
-              <p className="text-sm">Silakan lakukan mint tiket untuk membuka fitur Event Day (QR Code Gate Pass).</p>
+        {/* Tab Content */}
+        {activeTab === 'pre' && (
+          <div className="bg-slate-900/80 border border-cyan-500/40 rounded-2xl p-6 backdrop-blur">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-cyan-400">
+                Tier Selection
+              </span>
+            </div>
+
+            <h2 className="text-xl font-bold text-white uppercase mb-1">Select Your Tier</h2>
+            <p className="text-slate-400 text-xs font-mono mb-6">
+              // Pilih tier & selesaikan transaksi untuk membuka Event Day Gate Pass
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {ticketTiers.map((tier) => (
+                <button
+                  key={tier.id}
+                  onClick={() => setSelectedTier(tier.id)}
+                  className={`p-4 rounded-xl text-left transition-all bg-slate-950/60 backdrop-blur ${
+                    selectedTier === tier.id
+                      ? 'border border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.25)]'
+                      : 'border border-cyan-500/20 hover:border-cyan-500/60'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-400 border border-cyan-500/40 px-2 py-0.5 rounded">
+                      {tier.name} PASS
+                    </span>
+                    <span className="font-mono text-[10px] text-emerald-400 uppercase">
+                      {tier.network}
+                    </span>
+                  </div>
+                  <div className="text-2xl font-bold text-white font-mono">{tier.price}</div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-1">
+                    ≈ Rp{' '}
+                    {tier.id === 1 ? '50.000' : tier.id === 2 ? '150.000' : '500.000'}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button className="w-full py-3 px-6 bg-cyan-500 text-slate-950 font-mono text-xs font-bold uppercase tracking-[0.2em] rounded-lg hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+              {'>'} MINT TIKET SEKARANG
+            </button>
+
+            <div className="mt-4 p-3 bg-slate-950/60 border border-cyan-500/20 rounded-lg font-mono text-[10px] text-slate-400">
+              <span className="text-cyan-400">// STATUS:</span> Wallet belum terhubung. Klik
+              "Connect Wallet" di header untuk mulai mint.
             </div>
           </div>
         )}
 
-        {/* --- TAMPILAN 2: EVENT DAY (GATE PASS QR CODE) --- */}
         {activeTab === 'day' && (
-          <div>
-            {hasTicket ? (
-              <EventDayTicket
-                tokenId={1}
-                contractAddress={contractAddress}
-                ownerAddress={address || '0x...'}
-                tier="VIP PASS"
-                perks={['Akses Gate Utama', 'Fast-Track Queue', 'Digital POAP Badge']}
-                status="UNUSED"
-              />
-            ) : (
-              <div className="bg-slate-800/40 border border-red-500/30 rounded-2xl p-8 text-center">
-                <p className="text-4xl mb-4">🔒</p>
-                <h3 className="text-xl font-bold text-red-400 mb-2">Akses Terkunci</h3>
-                <p className="text-slate-400 text-sm mb-6">
-                  Fitur QR Code Gate Pass hanya dapat diakses oleh pemilik tiket terverifikasi di-chain.
-                </p>
-                <button
-                  onClick={() => setActiveTab('pre')}
-                  className="px-6 py-2.5 bg-mint-green text-slate-900 font-bold rounded-lg text-xs font-mono hover:bg-mint-green/90 transition-colors"
-                >
-                  Beli / Mint Tiket Sekarang →
-                </button>
-              </div>
-            )}
-          </div>
+          <EventDayTicket
+            tokenId={selectedTier}
+            contractAddress="0xbdb5f9745Db186C25424fA0EC5b81009980B87c2"
+            ownerAddress="0x8fc179213fb33f2bf61c8abae3d2a469e9f167b9"
+            tier={ticketTiers.find((t) => t.id === selectedTier)?.name || 'VIP'}
+            perks={['Akses Gate Utama', 'Fast-Track Queue', 'Digital POAP Badge']}
+            status="UNUSED"
+          />
         )}
 
-        {/* --- TAMPILAN 3: POST-EVENT (POAP & COLLECTIBLE) --- */}
         {activeTab === 'post' && (
-          <div>
-            {hasTicket ? (
-              <div className="bg-slate-800/40 border border-purple-500/30 rounded-2xl p-8 text-center space-y-4">
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-mono">FINISHER POAP</span>
-                <h3 className="text-2xl font-bold text-purple-400">Digital Souvenir & Attendance POAP</h3>
-                <p className="text-slate-400 text-sm max-w-md mx-auto">
-                  Acara telah selesai. Tiket NFT Anda kini tersimpan secara permanen di wallet sebagai bukti kehadiran bersejarah.
-                </p>
-              </div>
-            ) : (
-              <div className="bg-slate-800/40 border border-red-500/30 rounded-2xl p-8 text-center">
-                <p className="text-4xl mb-4">🔒</p>
-                <h3 className="text-xl font-bold text-red-400 mb-2">Akses Terkunci</h3>
-                <p className="text-slate-400 text-sm">Anda harus memiliki tiket untuk melihat souvenir POAP acara ini.</p>
-              </div>
-            )}
+          <div className="bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-8 text-center backdrop-blur">
+            <div className="inline-block px-3 py-1 border border-emerald-500/40 rounded-md font-mono text-[10px] uppercase tracking-[0.3em] text-emerald-400 mb-4">
+              FINISHER POAP
+            </div>
+            <h3 className="text-2xl font-bold uppercase text-white mb-2">
+              Digital Souvenir & Attendance POAP
+            </h3>
+            <p className="text-slate-400 text-sm font-mono max-w-md mx-auto">
+              // Acara telah selesai. Tiket NFT Anda kini tersimpan permanen di wallet sebagai
+              bukti kehadiran bersejarah.
+            </p>
           </div>
         )}
 
-        {/* Tombol Kembali ke Marketplace */}
-        <div className="mt-8 text-center">
-          <Link href="/marketplace" className="text-xs font-mono text-slate-500 hover:text-mint-green transition-colors">
-            ← Kembali ke Marketplace
+        {/* Footer */}
+        <div className="mt-10 text-center">
+          <Link
+            href="/marketplace"
+            className="inline-block font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500 hover:text-cyan-400 transition-colors border border-slate-700 hover:border-cyan-500/40 px-4 py-2 rounded"
+          >
+            {'< KEMBALI KE MARKETPLACE'}
           </Link>
         </div>
-
       </div>
     </main>
   );
