@@ -45,7 +45,9 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
     }
 
     function _replace(string memory source, string memory search, string memory replace)
-        internal pure returns (string memory)
+        internal
+        pure
+        returns (string memory)
     {
         bytes memory s = bytes(source);
         bytes memory searchBytes = bytes(search);
@@ -57,24 +59,34 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
         for (uint256 i = 0; i <= s.length - searchBytes.length; i++) {
             bool isMatch = true;
             for (uint256 j = 0; j < searchBytes.length; j++) {
-                if (s[i + j] != searchBytes[j]) { isMatch = false; break; }
+                if (s[i + j] != searchBytes[j]) {
+                    isMatch = false;
+                    break;
+                }
             }
-            if (isMatch) { index = i; found = true; break; }
+            if (isMatch) {
+                index = i;
+                found = true;
+                break;
+            }
         }
         if (!found) return source;
 
         uint256 newLen = s.length - searchBytes.length + replaceBytes.length;
         bytes memory r = new bytes(newLen);
-        for (uint256 i = 0; i < index; i++) r[i] = s[i];
-        for (uint256 i = 0; i < replaceBytes.length; i++) r[index + i] = replaceBytes[i];
-        for (uint256 i = 0; i < s.length - index - searchBytes.length; i++)
+        for (uint256 i = 0; i < index; i++) {
+            r[i] = s[i];
+        }
+        for (uint256 i = 0; i < replaceBytes.length; i++) {
+            r[index + i] = replaceBytes[i];
+        }
+        for (uint256 i = 0; i < s.length - index - searchBytes.length; i++) {
             r[index + replaceBytes.length + i] = s[index + searchBytes.length + i];
+        }
         return string(r);
     }
 
-    function configureTier(uint256 id, uint256 maxSupply, uint256 price)
-        external onlyRole(ADMIN_ROLE)
-    {
+    function configureTier(uint256 id, uint256 maxSupply, uint256 price) external onlyRole(ADMIN_ROLE) {
         require(id >= REGULAR_ID && id <= VVIP_ID, "Invalid tier");
         require(maxSupply > 0 && price > 0);
         tiers[id] = Tier({maxSupply: maxSupply, currentSupply: 0, price: price, active: true});
@@ -90,7 +102,7 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
         require(id >= REGULAR_ID && id <= VVIP_ID, "Invalid tier");
         require(newPrice > 0, "Price must be > 0");
         require(tiers[id].active, "Tier not active");
-        
+
         tiers[id].price = newPrice;
         emit PriceUpdated(id, newPrice);
     }
@@ -117,7 +129,7 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
     function withdraw() external onlyRole(ADMIN_ROLE) {
         uint256 bal = address(this).balance;
         require(bal > 0);
-        (bool ok, ) = payable(msg.sender).call{value: bal}("");
+        (bool ok,) = payable(msg.sender).call{value: bal}("");
         require(ok, "Withdraw failed");
         emit FundsWithdrawn(msg.sender, bal);
     }
@@ -127,11 +139,19 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
         _setURI(newUri);
     }
 
-    function getBalance() external view returns (uint256) { return address(this).balance; }
-    function pause() external onlyRole(ADMIN_ROLE) { _pause(); }
-    function unpause() external onlyRole(ADMIN_ROLE) { _unpause(); }
+    function getBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
 
-    function supportsInterface(bytes4 interfaceId)
-        public view override(ERC1155, AccessControl) returns (bool)
-    { return super.supportsInterface(interfaceId); }
+    function pause() external onlyRole(ADMIN_ROLE) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(ADMIN_ROLE) {
+        _unpause();
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC1155, AccessControl) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
 }

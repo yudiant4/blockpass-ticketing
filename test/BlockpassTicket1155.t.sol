@@ -16,9 +16,9 @@ contract BlockpassTicket1155Test is Test {
         vm.prank(admin);
         ticket.configureTier(1, 100, 0.001 ether); // REGULAR
         vm.prank(admin);
-        ticket.configureTier(2, 50, 0.003 ether);  // VIP
+        ticket.configureTier(2, 50, 0.003 ether); // VIP
         vm.prank(admin);
-        ticket.configureTier(3, 20, 0.01 ether);   // VVIP
+        ticket.configureTier(3, 20, 0.01 ether); // VVIP
     }
 
     function test_MintRegular() public {
