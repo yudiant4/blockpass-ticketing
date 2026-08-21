@@ -27,6 +27,7 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
     string private _baseURI;
 
     event TierConfigured(uint256 indexed tokenId, uint256 maxSupply, uint256 price);
+    event PriceUpdated(uint256 indexed tierId, uint256 newPrice);
     event TicketMinted(address indexed buyer, uint256 indexed tokenId, uint256 amount, uint256 totalPrice);
     event FundsWithdrawn(address indexed admin, uint256 amount);
 
@@ -78,6 +79,20 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
         require(maxSupply > 0 && price > 0);
         tiers[id] = Tier({maxSupply: maxSupply, currentSupply: 0, price: price, active: true});
         emit TierConfigured(id, maxSupply, price);
+    }
+
+    /**
+     * @dev Update price for an existing tier (only ADMIN_ROLE)
+     * @param id Tier ID (1=REGULAR, 2=VIP, 3=VVIP)
+     * @param newPrice New price in wei
+     */
+    function updatePrice(uint256 id, uint256 newPrice) external onlyRole(ADMIN_ROLE) {
+        require(id >= REGULAR_ID && id <= VVIP_ID, "Invalid tier");
+        require(newPrice > 0, "Price must be > 0");
+        require(tiers[id].active, "Tier not active");
+        
+        tiers[id].price = newPrice;
+        emit PriceUpdated(id, newPrice);
     }
 
     function mintTicket(uint256 id, uint256 amount) public payable whenNotPaused returns (uint256) {
