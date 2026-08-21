@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { QRCodeSVG } from 'qrcode-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { CheckCircle, XCircle, Zap } from 'lucide-react';
 
 interface EventDayTicketProps {
