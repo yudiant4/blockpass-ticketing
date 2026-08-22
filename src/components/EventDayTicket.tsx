@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { CheckCircle, Zap } from 'lucide-react';
+import { css } from '../../styled-system/css';
 
 interface EventDayTicketProps {
   tokenId: string | number;
@@ -66,43 +67,146 @@ export default function EventDayTicket({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 flex flex-col items-center justify-center gap-6">
+    <div className={css({
+      minHeight: '100vh',
+      bg: 'bg',
+      color: 'text',
+      p: '4',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '6',
+    })}>
       {/* Header with status badge */}
-      <div className="w-full max-w-md flex justify-between items-center">
-        <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest">
+      <div className={css({
+        width: 'full',
+        maxWidth: 'md',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      })}>
+        <h2 className={css({
+          fontSize: 'xl',
+          fontWeight: 'bold',
+          textTransform: 'uppercase',
+          color: 'cyan',
+          letterSpacing: 'widest',
+        })}>
           Event Day Ticket
         </h2>
-        <span
-          className={`px-3 py-1 rounded-full text-sm font-medium border ${
-            ticketStatus === 'UNUSED'
-              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-              : 'bg-slate-600/20 text-slate-400 border-slate-600'
-          }`}
-        >
+        <span className={css({
+          px: '3',
+          py: '1',
+          borderRadius: 'full',
+          fontSize: 'sm',
+          fontWeight: 'medium',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          bg: ticketStatus === 'UNUSED' ? 'emerald.500/20' : 'card',
+          color: ticketStatus === 'UNUSED' ? 'emerald.400' : 'text',
+          borderColor: ticketStatus === 'UNUSED' ? 'emerald.500/40' : 'border',
+        })}>
           {ticketStatus}
         </span>
       </div>
 
-      {/* QR Code Section (only show if UNUSED) */}
+      {/* QR Code Section */}
       {ticketStatus === 'UNUSED' && !isScanning && (
-        <div className="flex items-center justify-center w-full">
-          {/* QR Container with dramatic effects */}
-          <div className="relative w-[280px] h-[280px]">
+        <div className={css({
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 'full',
+        })}>
+          <div className={css({
+            position: 'relative',
+            width: '280px',
+            height: '280px',
+          })}>
             {/* Outer glow ring */}
-            <div className="absolute inset-0 border-2 border-cyan-500/30 rounded-xl animate-pulse" style={{ animationDuration: '2s' }} />
-            {/* Inner container */}
-            <div className="relative w-full h-full bg-slate-900/80 border border-cyan-500/40 rounded-xl p-4 backdrop-blur-xl overflow-hidden">
-              {/* Corner brackets */}
-              <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-cyan-400 rounded-tl-xl" />
-              <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-cyan-400 rounded-tr-xl" />
-              <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-cyan-400 rounded-bl-xl" />
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-cyan-400 rounded-br-xl" />
+            <div className={css({
+              position: 'absolute',
+              inset: '0',
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              borderColor: 'cyan.500/30',
+              borderRadius: 'xl',
+              animation: 'pulseBlob 2s infinite',
+            })} />
 
-              {/* Scan line animation */}
-              <div className="absolute left-4 right-4 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full shadow-[0_0_20px_rgba(34,211,238,0.8)] animate-pulse" />
+            {/* Inner container */}
+            <div className={css({
+              position: 'relative',
+              width: 'full',
+              height: 'full',
+              bg: 'card/80',
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              borderColor: 'cyan.500/40',
+              borderRadius: 'xl',
+              p: '4',
+              backdropFilter: 'blur(20px)',
+              overflow: 'hidden',
+            })}>
+              {/* Corner brackets */}
+              <div className={css({
+                position: 'absolute',
+                top: '-1',
+                left: '-1',
+                width: '6',
+                height: '6',
+                borderTopWidth: '2px',
+                borderLeftWidth: '2px',
+                borderStyle: 'solid',
+                borderColor: 'cyan.400',
+                borderTopLeftRadius: 'xl',
+              })} />
+              <div className={css({
+                position: 'absolute',
+                top: '-1',
+                right: '-1',
+                width: '6',
+                height: '6',
+                borderTopWidth: '2px',
+                borderRightWidth: '2px',
+                borderStyle: 'solid',
+                borderColor: 'cyan.400',
+                borderTopRightRadius: 'xl',
+              })} />
+              <div className={css({
+                position: 'absolute',
+                bottom: '-1',
+                left: '-1',
+                width: '6',
+                height: '6',
+                borderBottomWidth: '2px',
+                borderLeftWidth: '2px',
+                borderStyle: 'solid',
+                borderColor: 'cyan.400',
+                borderBottomLeftRadius: 'xl',
+              })} />
+              <div className={css({
+                position: 'absolute',
+                bottom: '-1',
+                right: '-1',
+                width: '6',
+                height: '6',
+                borderBottomWidth: '2px',
+                borderRightWidth: '2px',
+                borderStyle: 'solid',
+                borderColor: 'cyan.400',
+                borderBottomRightRadius: 'xl',
+              })} />
 
               {/* QR Code */}
-              <div className="absolute inset-4 flex items-center justify-center">
+              <div className={css({
+                position: 'absolute',
+                inset: '4',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              })}>
                 <QRCodeSVG
                   value={qrData}
                   size={240}
@@ -114,14 +218,33 @@ export default function EventDayTicket({
               </div>
 
               {/* Decorative center overlay */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className={css({
+                position: 'absolute',
+                inset: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+              })}>
                 <Zap className="h-10 w-10 text-cyan-400/30" />
               </div>
             </div>
 
             {/* Gate pass label */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
-              <p className="font-mono text-xs text-cyan-400/70 uppercase tracking-widest">
+            <div className={css({
+              position: 'absolute',
+              bottom: '8',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              textAlign: 'center',
+            })}>
+              <p className={css({
+                fontFamily: 'mono',
+                fontSize: 'xs',
+                color: 'cyan.400/70',
+                textTransform: 'uppercase',
+                letterSpacing: 'widest',
+              })}>
                 GATE PASS READY
               </p>
             </div>
@@ -131,20 +254,84 @@ export default function EventDayTicket({
 
       {/* Scanning Animation Overlay */}
       {isScanning && (
-        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-          <div className="relative w-[280px] h-[280px]">
-            <div className="absolute inset-0 border-2 border-cyan-500/30 rounded-xl" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-[240px] h-[240px] bg-slate-900/80 rounded-xl flex flex-col items-center justify-center p-6">
+        <div className={css({
+          position: 'fixed',
+          inset: '0',
+          bg: 'bg/90',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: '50',
+        })}>
+          <div className={css({
+            position: 'relative',
+            width: '280px',
+            height: '280px',
+          })}>
+            <div className={css({
+              position: 'absolute',
+              inset: '0',
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              borderColor: 'cyan.500/30',
+              borderRadius: 'xl',
+            })} />
+            <div className={css({
+              position: 'absolute',
+              inset: '0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            })}>
+              <div className={css({
+                width: '240px',
+                height: '240px',
+                bg: 'card/80',
+                borderRadius: 'xl',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                p: '6',
+              })}>
                 <Zap className="h-12 w-12 text-cyan-400 animate-spin mb-4" />
-                <p className="font-mono text-sm text-cyan-400 uppercase tracking-widest">SCANNING...</p>
-                <div className="mt-6 w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+                <p className={css({
+                  fontFamily: 'mono',
+                  fontSize: 'sm',
+                  color: 'cyan',
+                  textTransform: 'uppercase',
+                  letterSpacing: 'widest',
+                })}>
+                  SCANNING...
+                </p>
+                <div className={css({
+                  mt: '6',
+                  width: 'full',
+                  height: '2',
+                  bg: 'bg',
+                  borderRadius: 'full',
+                  overflow: 'hidden',
+                })}>
                   <div
-                    className="h-full bg-gradient-to-r from-cyan-500 via-emerald-500 to-amber-500 rounded-full transition-all duration-300"
+                    className={css({
+                      height: 'full',
+                      bg: 'gradient-to-r from-cyan.500 via-emerald.500 to-amber.500',
+                      borderRadius: 'full',
+                      transition: 'all 300ms',
+                    })}
                     style={{ width: `${scanProgress}%` }}
                   />
                 </div>
-                <p className="mt-3 font-mono text-xs text-slate-400">{scanProgress}%</p>
+                <p className={css({
+                  mt: '3',
+                  fontFamily: 'mono',
+                  fontSize: 'xs',
+                  color: 'text',
+                })}>
+                  {scanProgress}%
+                </p>
               </div>
             </div>
           </div>
@@ -153,36 +340,152 @@ export default function EventDayTicket({
 
       {/* Used state success icon */}
       {ticketStatus === 'USED' && (
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="relative">
+        <div className={css({
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '4',
+        })}>
+          <div className={css({ position: 'relative' })}>
             <CheckCircle className="h-16 w-16 text-emerald-400" />
-            <div className="absolute inset-0 border-2 border-emerald-500/30 rounded-full animate-pulse" />
+            <div className={css({
+              position: 'absolute',
+              inset: '0',
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              borderColor: 'emerald.500/30',
+              borderRadius: 'full',
+              animation: 'pulseBlob 2s infinite',
+            })} />
           </div>
-          <p className="text-xl font-bold text-white">Ticket Successfully Used</p>
+          <p className={css({
+            fontSize: 'xl',
+            fontWeight: 'bold',
+            color: 'text',
+          })}>
+            Ticket Successfully Used
+          </p>
         </div>
       )}
 
       {/* Metadata Card */}
-      <div className="w-full max-w-md bg-slate-900/60 border border-cyan-500/30 rounded-2xl p-6 space-y-4 backdrop-blur-xl">
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Token ID</p>
-          <p className="text-3xl font-bold font-mono text-cyan-400">{tokenId}</p>
+      <div className={css({
+        width: 'full',
+        maxWidth: 'md',
+        bg: 'card/60',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'cyan.500/30',
+        borderRadius: '2xl',
+        p: '6',
+        backdropFilter: 'blur(20px)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4',
+      })}>
+        <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
+          <p className={css({
+            fontSize: 'xs',
+            fontWeight: 'medium',
+            color: 'text',
+            textTransform: 'uppercase',
+            letterSpacing: 'widest',
+          })}>
+            Token ID
+          </p>
+          <p className={css({
+            fontSize: '3xl',
+            fontWeight: 'bold',
+            fontFamily: 'mono',
+            color: 'cyan',
+          })}>
+            {tokenId}
+          </p>
         </div>
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Contract</p>
-          <p className="text-xs font-mono text-slate-300 break-all">{contractAddress}</p>
+
+        <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
+          <p className={css({
+            fontSize: 'xs',
+            fontWeight: 'medium',
+            color: 'text',
+            textTransform: 'uppercase',
+            letterSpacing: 'widest',
+          })}>
+            Contract
+          </p>
+          <p className={css({
+            fontSize: 'xs',
+            fontFamily: 'mono',
+            color: 'text',
+          })}>
+            {contractAddress}
+          </p>
         </div>
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Tier</p>
-          <p className="text-lg font-bold text-emerald-400 uppercase">{tier}</p>
+
+        <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
+          <p className={css({
+            fontSize: 'xs',
+            fontWeight: 'medium',
+            color: 'text',
+            textTransform: 'uppercase',
+            letterSpacing: 'widest',
+          })}>
+            Tier
+          </p>
+          <p className={css({
+            fontSize: 'lg',
+            fontWeight: 'bold',
+            color: 'emerald',
+            textTransform: 'uppercase',
+          })}>
+            {tier}
+          </p>
         </div>
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Perks</p>
-          <ul className="space-y-2 text-slate-300 font-mono text-sm">
+
+        <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
+          <p className={css({
+            fontSize: 'xs',
+            fontWeight: 'medium',
+            color: 'text',
+            textTransform: 'uppercase',
+            letterSpacing: 'widest',
+          })}>
+            Perks
+          </p>
+          <ul className={css({
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2',
+            fontFamily: 'mono',
+            fontSize: 'sm',
+            color: 'text',
+          })}>
             {perks.map((perk, idx) => (
-              <li key={idx} className="flex items-center gap-3 p-3 bg-slate-950/60 border border-cyan-500/20 rounded-lg hover:border-cyan-500/50 transition-all">
-                <span className="w-2 h-2 bg-cyan-400 rounded-full" />
-                <span className="hover:text-cyan-300 transition-colors">{perk}</span>
+              <li
+                key={idx}
+                className={css({
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3',
+                  p: '3',
+                  bg: 'card/60',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'cyan.500/20',
+                  borderRadius: 'lg',
+                  _hover: {
+                    borderColor: 'cyan.500/50',
+                  },
+                })}
+              >
+                <span className={css({
+                  width: '2',
+                  height: '2',
+                  bg: 'cyan.400',
+                  borderRadius: 'full',
+                })} />
+                <span>{perk}</span>
               </li>
             ))}
           </ul>
@@ -190,24 +493,73 @@ export default function EventDayTicket({
       </div>
 
       {/* Action Buttons */}
-      <div className="w-full max-w-md space-y-3">
-        {/* Scan QR Button (only if UNUSED and not scanning) */}
+      <div className={css({
+        width: 'full',
+        maxWidth: 'md',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '3',
+      })}>
         {ticketStatus === 'UNUSED' && !isScanning && (
           <button
             onClick={handleScan}
             disabled={isScanning}
-            className="w-full py-4 px-6 bg-cyan-500 text-slate-950 font-bold rounded-lg hover:bg-cyan-400 transition-all duration-200 shadow-xl shadow-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-500/40 active:scale-[0.98] flex items-center justify-center gap-2"
+            className={css({
+              width: 'full',
+              py: '4',
+              px: '6',
+              bg: 'cyan',
+              color: 'bg',
+              fontWeight: 'bold',
+              borderRadius: 'lg',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 200ms',
+              boxShadow: 'shadow.cyan.500/30',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2',
+              _hover: {
+                bg: 'cyan.400',
+                boxShadow: 'shadow.cyan.500/40',
+              },
+            })}
           >
             <Zap className="h-5 w-5" />
             <span>SCAN QR AT GATE</span>
           </button>
         )}
 
-        {/* Claim Perks Button */}
         <button
           onClick={handleClaim}
           disabled={isPerkClaimed}
-          className="w-full py-4 px-6 bg-emerald-500/20 text-emerald-400 font-bold rounded-lg border border-emerald-500/40 hover:bg-emerald-500/30 hover:border-emerald-500/60 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/20 active:scale-[0.98]"
+          className={css({
+            width: 'full',
+            py: '4',
+            px: '6',
+            bg: 'emerald.500/20',
+            color: 'emerald.400',
+            fontWeight: 'bold',
+            borderRadius: 'lg',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: 'emerald.500/40',
+            cursor: 'pointer',
+            transition: 'all 200ms',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '2',
+            _hover: {
+              bg: 'emerald.500/30',
+              borderColor: 'emerald.500/60',
+            },
+            _disabled: {
+              opacity: '0.5',
+              cursor: 'not-allowed',
+            },
+          })}
         >
           {isPerkClaimed ? (
             <>
