@@ -3,23 +3,15 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { css } from '../../../../styled-system/css';
 import dynamic from 'next/dynamic';
 
 const EventDayTicket = dynamic(() => import('../../../components/EventDayTicket'), {
   ssr: false,
-  loading: () => css({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 64,
-    color: 'text',
-    fontFamily: 'mono',
-    fontSize: 'xs',
-    textTransform: 'uppercase',
-    letterSpacing: 'widest',
-    children: '// Loading Gate...',
-  }),
+  loading: () => (
+    <div className="flex items-center justify-center h-64 text-cyan-400 font-mono text-xs uppercase tracking-widest">
+      // Loading Gate...
+    </div>
+  ),
 });
 
 const ticketTiers = [
@@ -29,10 +21,10 @@ const ticketTiers = [
     price: '0.001 ETH',
     network: 'Ethereum',
     accent: 'cyan',
-    glow: 'shadow.cyan.500/30',
-    border: 'border.cyan.500/50',
-    badgeBg: 'bg.cyan.500/20',
-    badgeText: 'text.cyan.400',
+    glow: 'shadow-cyan-500/30',
+    border: 'border-cyan-500/50',
+    badgeBg: 'bg-cyan-500/20',
+    badgeText: 'text-cyan-400',
   },
   {
     id: 2,
@@ -40,10 +32,10 @@ const ticketTiers = [
     price: '0.003 ETH',
     network: 'Ethereum',
     accent: 'emerald',
-    glow: 'shadow.emerald.500/30',
-    border: 'border.emerald.500/50',
-    badgeBg: 'bg.emerald.500/20',
-    badgeText: 'text.emerald.400',
+    glow: 'shadow-emerald-500/30',
+    border: 'border-emerald-500/50',
+    badgeBg: 'bg-emerald-500/20',
+    badgeText: 'text-emerald-400',
   },
   {
     id: 3,
@@ -51,10 +43,10 @@ const ticketTiers = [
     price: '0.01 ETH',
     network: 'Ethereum',
     accent: 'amber',
-    glow: 'shadow.amber.500/30',
-    border: 'border.amber.500/50',
-    badgeBg: 'bg.amber.500/20',
-    badgeText: 'text.amber.400',
+    glow: 'shadow-amber-500/30',
+    border: 'border-amber-500/50',
+    badgeBg: 'bg-amber-500/20',
+    badgeText: 'text-amber-400',
   },
 ];
 
@@ -65,466 +57,150 @@ export default function EventDynamicPage() {
   const [activeTab, setActiveTab] = useState<'pre' | 'day' | 'post'>('pre');
   const [selectedTier, setSelectedTier] = useState<number>(2);
 
-  return css({
-    display: 'flex',
-    minHeight: '100vh',
-    bg: 'bg',
-    color: 'text',
-    position: 'relative',
-    overflow: 'hidden',
-    pt: '100px',
-    pb: '120px',
-    children: [
+  const selectedTierData = ticketTiers[selectedTier - 1] || ticketTiers[1];
+
+  return (
+    <main
+      className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden pt-[100px] pb-[120px]"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgba(34,211,238,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.05) 1px, transparent 1px)',
+        backgroundSize: '32px 32px',
+      }}
+    >
       {/* Animated background orbs */}
-      css({
-        position: 'absolute',
-        inset: 0,
-        overflow: 'hidden',
-        pointerEvents: 'none',
-        children: [
-          css({
-            position: 'absolute',
-            top: '-40px',
-            right: '-40px',
-            width: 80,
-            height: 80,
-            bg: 'cyan.500/10',
-            borderRadius: 'full',
-            blur: '3xl',
-            animation: 'pulseBlob 4s infinite',
-          }),
-          css({
-            position: 'absolute',
-            bottom: '-40px',
-            left: '-40px',
-            width: 80,
-            height: 80,
-            bg: 'emerald.500/10',
-            borderRadius: 'full',
-            blur: '3xl',
-            animation: 'pulseBlob 5s infinite 1s',
-          }),
-          css({
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%,-50%)',
-            width: 96,
-            height: 96,
-            bg: 'amber.500/5',
-            borderRadius: 'full',
-            blur: '3xl',
-            animation: 'pulseBlob 6s infinite 2s',
-          }),
-        ],
-      }),
-      {/* Main container */}
-      css({
-        position: 'relative',
-        zIndex: 10,
-        maxWidth: '4xl',
-        mx: 'auto',
-        px: 4,
-        py: 24,
-        children: [
-          {/* Header */}
-          css({
-            mb: 8,
-            textAlign: 'center',
-            children: [
-              css({
-                display: 'inline-block',
-                px: 3,
-                py: 1,
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderColor: 'border',
-                borderRadius: 'md',
-                fontFamily: 'mono',
-                fontSize: 'xs',
-                textTransform: 'uppercase',
-                letterSpacing: 'widest',
-                color: 'text',
-                mb: 4,
-                children: [
-                  `Event ${eventId} • NFT Ticketing`,
-                ],
-              }),
-              css({
-                fontSize: ['3xl', '4xl'],
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                color: 'text',
-                tracking: 'wide',
-                children: [
-                  'ALAS TRAIL RUN ',
-                  css({
-                    color: 'cyan',
-                    children: '2026',
-                  }),
-                ],
-              }),
-              css({
-                mt: 3,
-                fontSize: 'sm',
-                color: 'text',
-                fontFamily: 'mono',
-                children: [
-                  'Pacet, Mojokerto • ',
-                  css({
-                    color: 'emerald',
-                    children: 'Aug 15, 2026',
-                  }),
-                ],
-              }),
-            ],
-          }),
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
+      </div>
 
-          {/* Tab Navigation */}
-          css({
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 3,
-            mb: 8,
-            p: 2,
-            bg: 'card/80',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: 'border',
-            borderRadius: 'xl',
-            backdropBlur: 'xl',
-            children: [
-              { key: 'pre', label: '01 // PRE-EVENT' },
-              { key: 'day', label: '02 // EVENT DAY' },
-              { key: 'post', label: '03 // POST-EVENT' },
-            ].map((tab) => css({
-              key: tab.key,
-              onClick: () => setActiveTab(tab.key as 'pre' | 'day' | 'post'),
-              flex: 1,
-              px: 6,
-              py: '2.5',
-              borderRadius: 'lg',
-              fontFamily: 'mono',
-              fontSize: 'xs',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              tracking: 'widest',
-              transitionAll: 'duration-200',
-              css: {
-                backgroundColor: activeTab === tab.key
-                  ? 'cyan.500'
-                  : 'card/60',
-                color: activeTab === tab.key
-                  ? 'bg'
-                  : 'text',
-                boxShadow: activeTab === tab.key
-                  ? 'shadow-lg shadow-cyan-500/30'
-                  : 'none',
-                _hover: {
-                  backgroundColor: !(
-                    activeTab === tab.key
-                  ) && 'cyan.400',
-                  color: !(
-                    activeTab === tab.key
-                  ) && 'text',
-                },
-              },
-              children: tab.label,
-            })),
-          ],
+      <div className="relative z-10 max-w-4xl mx-auto px-4 py-24">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="inline-block px-3 py-1 border border-slate-700 rounded-md font-mono text-xs uppercase tracking-widest text-cyan-400 mb-4">
+            Event #{eventId} • NFT Ticketing
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold uppercase text-white tracking-wide">
+            ALAS TRAIL RUN <span className="text-cyan-400">2026</span>
+          </h1>
+          <p className="mt-3 text-slate-400 text-sm font-mono">
+            Pacet, Mojokerto • <span className="text-emerald-400">Aug 15, 2026</span>
+          </p>
+        </div>
 
-          {/* Tab Content */}
-          activeTab === 'pre' && css({
-            bg: 'card/60',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: 'border',
-            borderRadius: '2xl',
-            p: 6,
-            backdropBlur: 'xl',
-            children: [
-              css({
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                mb: 4,
-                children: [
-                  css({
-                    width: 2,
-                    height: 2,
-                    bg: 'cyan.400',
-                    borderRadius: 'full',
-                    animation: 'pulse 2s infinite',
-                  }),
-                  css({
-                    fontFamily: 'mono',
-                    fontSize: 'xs',
-                    textTransform: 'uppercase',
-                    letterSpacing: 'widest',
-                    color: 'cyan',
-                    children: 'Tier Selection',
-                  }),
-                ],
-              }),
-              css({
-                fontSize: 'xl',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                color: 'text',
-                mb: 1,
-                children: 'Select Your Tier',
-              }),
-              css({
-                mt: 3,
-                fontSize: 'xs',
-                color: 'text',
-                fontFamily: 'mono',
-                mb: 6,
-                children: '// Pilih tier & selesaikan transaksi untuk membuka Event Day Gate Pass',
-              }),
-              css({
-                display: 'grid',
-                gridTemplateColumns: ['1fr', 'md:3fr'],
-                gap: 4,
-                mb: 6,
-                children: ticketTiers.map((tier) => css({
-                  key: tier.id,
-                  onClick: () => setSelectedTier(tier.id),
-                  position: 'relative',
-                  p: 4,
-                  borderRadius: 'xl',
-                  textAlign: 'left',
-                  transitionAll: 'duration-300',
-                  bg: 'card/60',
-                  backdropBlur: 'xl',
-                  overflow: 'hidden',
-                  css: {
-                    border: selectedTier === tier.id
-                      ? `${tier.border} ${tier.glow} ring-2 ring-${tier.accent}-500/50 scale-[1.02]`
-                      : 'border.border.border/20 hover:border/60 hover:scale-102',
-                  },
-                  children: [
-                    {/* Tier accent bar */}
-                    css({
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: 1,
-                      bg: 'gradient-to-b from-cyan-500 via-emerald-500 to-amber-500',
-                    }),
-                    css({
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      mb: 2,
-                      children: [
-                        css({
-                          fontFamily: 'mono',
-                          fontSize: 'xs',
-                          textTransform: 'uppercase',
-                          letterSpacing: 'widest',
-                          px: 2,
-                          py: '0.5',
-                          borderWidth: '1px',
-                          borderStyle: 'solid',
-                          borderColor: `border.${tier.accent}-500/40`,
-                          color: `text.${tier.accent}.400`,
-                          children: `${tier.name} PASS`,
-                        }),
-                        css({
-                          fontFamily: 'mono',
-                          fontSize: 'xs',
-                          color: `text.${tier.accent}.400`,
-                          textTransform: 'uppercase',
-                          children: tier.network,
-                        }),
-                      ],
-                    }),
-                    css({
-                      fontSize: '2xl',
-                      fontWeight: 'bold',
-                      fontFamily: 'mono',
-                      color: 'text',
-                      children: tier.price,
-                    }),
-                    css({
-                      mt: 1,
-                      fontSize: 'xs',
-                      color: 'text',
-                      fontFamily: 'mono',
-                      children: [
-                        `≈ Rp`,
-                        tier.id === 1 ? '50.000' : tier.id === 2 ? '150.000' : '500.000',
-                      ],
-                    }),
-                    {/* Hover shimmer */}
-                    css({
-                      position: 'absolute',
-                      inset: 0,
-                      bg: 'gradient-to-r from-transparent via-white/5 to-transparent',
-                      transform: 'translateX(-100%)',
-                      transition: 'transform duration-700',
-                      _hover: {
-                        transform: 'translateX(0)',
-                      },
-                    }),
-                  ],
-                }),
-              }),
-              css({
-                width: 'full',
-                p: [3, 6],
-                bg: 'cyan.500',
-                color: 'bg',
-                fontFamily: 'mono',
-                fontSize: ['xs'],
-                fontWeight: ['bold', 'uppercase'],
-                tracking: 'wider',
-                borderRadius: 'lg',
-                hover: {
-                  bg: 'cyan.400',
-                },
-                transition: 'all duration-200',
-                shadow: 'shadow-lg shadow-cyan-500/30',
-                children: [
-                  { '>': ' ' },
-                  'MINT TIKET SEKARANG',
-                ],
-              }),
-              css({
-                mt: 4,
-                p: 3,
-                bg: 'card/60',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderColor: 'border',
-                borderRadius: 'lg',
-                fontFamily: 'mono',
-                fontSize: 'xs',
-                color: 'text',
-                children: [
-                  css({
-                    color: 'cyan',
-                    children: '// STATUS:',
-                  }),
-                  ' Wallet belum terhubung. Klik ',
-                  css({
-                    color: 'cyan',
-                    children: '"Connect Wallet" di header untuk mulai mint.',
-                  }),
-                ],
-              }),
-            ],
-          }),
+        {/* Tab Navigation */}
+        <div className="flex justify-center gap-3 mb-8 p-2 bg-slate-900/80 border border-slate-700 rounded-xl backdrop-blur-xl">
+          {[
+            { key: 'pre', label: '01 // PRE-EVENT' },
+            { key: 'day', label: '02 // EVENT DAY' },
+            { key: 'post', label: '03 // POST-EVENT' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as 'pre' | 'day' | 'post')}
+              className={`flex-1 px-4 py-2.5 rounded-lg font-mono text-xs font-bold uppercase tracking-widest transition-all duration-200 ${
+                activeTab === tab.key
+                  ? 'bg-cyan-500 text-slate-950 shadow-xl shadow-cyan-500/30'
+                  : 'bg-slate-950/60 text-slate-400 border border-slate-700 hover:text-cyan-400 hover:border-cyan-500/60'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          activeTab === 'day' && css({
-            children: [
-              css({
-                tokenId: selectedTier,
-                contractAddress: '0xbdb5f9745Db186C25424fA0EC5b81009980B87c2',
-                ownerAddress: '0x8fc179213fb33f2bf61c8abae3d2a469e9f167b9',
-                tier: ticketTiers[selectedTier].name,
-                tierData: {
-                  accent: selectedTier === 0 ? 'cyan' : selectedTier === 1 ? 'emerald' : 'amber',
-                  glow: selectedTier === 0 ? 'shadow.cyan.500/30' : selectedTier === 1 ? 'shadow.emerald.500/30' : 'shadow.amber.500/30',
-                  border: selectedTier === 0 ? 'border.cyan.500/50' : selectedTier === 1 ? 'border.emerald.500/50' : 'border.amber.500/50',
-                  badgeBg: selectedTier === 0 ? 'bg.cyan.500/20' : selectedTier === 1 ? 'bg.emerald.500/20' : 'bg.amber.500/20',
-                  badgeText: selectedTier === 0 ? 'text.cyan.400' : selectedTier === 1 ? 'text.emerald.400' : 'text.amber.400',
-                },
-                perks: ticketTiers[selectedTier].benefits,
-                status: 'UNUSED',
-              }, {}, 'EventDayTicket'),
-            ],
-          }),
+        {/* Tab Content */}
+        {activeTab === 'pre' && (
+          <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 backdrop-blur-xl">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+              <span className="font-mono text-xs uppercase tracking-widest text-cyan-400">
+                Tier Selection
+              </span>
+            </div>
 
-          activeTab === 'post' && css({
-            bg: 'card/60',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: 'border',
-            borderRadius: '2xl',
-            p: 8,
-            textAlign: 'center',
-            backdropBlur: 'xl',
-            children: [
-              css({
-                display: 'inline-block',
-                px: 3,
-                py: 1,
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderColor: 'border',
-                borderRadius: 'md',
-                fontFamily: 'mono',
-                fontSize: 'xs',
-                textTransform: 'uppercase',
-                letterSpacing: 'widest',
-                color: 'emerald',
-                children: 'FINISHER POAP',
-              }, {}, 'span'),
-              css({
-                fontSize: ['2xl'],
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                color: 'text',
-                mb: 2,
-                children: 'Digital Souvenir & Attendance POAP',
-              }),
-              css({
-                mt: 3,
-                fontSize: 'sm',
-                color: 'text',
-                fontFamily: 'mono',
-                maxWidth: 'md',
-                mx: 'auto',
-                children: [
-                  '// Acara telah selesai. Tiket NFT Anda kini tersimpan permanen di wallet sebagai',
-                  css({
-                    display: 'block',
-                    mb: 2,
-                  }),
-                  'bukti kehadiran bersejarah.',
-                ],
-              }),
-            ],
-          }),
+            <h2 className="text-xl font-bold text-white uppercase mb-1">Select Your Tier</h2>
+            <p className="text-slate-400 text-xs font-mono mb-6">
+              // Pilih tier & selesaikan transaksi untuk membuka Event Day Gate Pass
+            </p>
 
-          {/* Footer */}
-          css({
-            mt: 10,
-            textAlign: 'center',
-            children: [
-              css({
-                display: 'inline-block',
-                fontFamily: 'mono',
-                fontSize: 'xs',
-                textTransform: 'uppercase',
-                letterSpacing: 'widest',
-                color: 'text',
-                transition: 'all duration-200',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderColor: 'border',
-                hover: {
-                  borderColor: 'cyan',
-                },
-                px: 4,
-                py: 2,
-                borderRadius: 'md',
-                _hover: {
-                  bg: 'card/60',
-                  backdropBlur: '',
-                },
-                children: [
-                  {'<': ' '},
-                  'KEMBALI KE MARKETPLACE',
-                ],
-              }),
-            ],
-          }),
-        ],
-      }),
-    ],
-  });
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {ticketTiers.map((tier) => (
+                <button
+                  key={tier.id}
+                  onClick={() => setSelectedTier(tier.id)}
+                  className={`relative p-4 rounded-xl text-left transition-all duration-300 bg-slate-900/60 backdrop-blur-xl overflow-hidden border ${
+                    selectedTier === tier.id
+                      ? `${tier.border} ${tier.glow} scale-[1.02]`
+                      : 'border-slate-700 hover:border-cyan-500/60 hover:scale-[1.02]'
+                  }`}
+                >
+                  {/* Tier accent bar */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-cyan-500 via-emerald-500 to-amber-500" />
+
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`font-mono text-xs uppercase tracking-widest ${tier.badgeText} ${tier.badgeBg} border ${tier.border} px-2 py-0.5 rounded`}>
+                      {tier.name} PASS
+                    </span>
+                    <span className="font-mono text-xs text-emerald-400 uppercase">
+                      {tier.network}
+                    </span>
+                  </div>
+                  <div className="text-2xl font-bold text-white font-mono">{tier.price}</div>
+                  <div className="text-xs text-slate-500 font-mono mt-1">
+                    ≈ Rp {tier.id === 1 ? '50.000' : tier.id === 2 ? '150.000' : '500.000'}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button className="w-full py-3 px-6 bg-cyan-500 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-cyan-400 transition-all duration-200 shadow-xl shadow-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-500/40">
+              {'>'} MINT TIKET SEKARANG
+            </button>
+
+            <div className="mt-4 p-3 bg-slate-950/60 border border-slate-700 rounded-lg font-mono text-xs text-slate-400">
+              <span className="text-cyan-400">// STATUS:</span> Wallet belum terhubung. Klik "Connect Wallet" di header untuk mulai mint.
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'day' && (
+          <EventDayTicket
+            tokenId={selectedTier}
+            contractAddress="0xbdb5f9745Db186C25424fA0EC5b81009980B87c2"
+            ownerAddress="0x8fc179213fb33f2bf61c8abae3d2a469e9f167b9"
+            tier={selectedTierData.name}
+            tierData={selectedTierData}
+            perks={['Akses Gate Utama', 'Fast-Track Queue', 'Digital POAP Badge']}
+            status="UNUSED"
+          />
+        )}
+
+        {activeTab === 'post' && (
+          <div className="bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-8 text-center backdrop-blur-xl">
+            <div className="inline-block px-3 py-1 border border-emerald-500/40 rounded-md font-mono text-xs uppercase tracking-widest text-emerald-400 mb-4">
+              FINISHER POAP
+            </div>
+            <h3 className="text-2xl font-bold uppercase text-white mb-2">
+              Digital Souvenir & Attendance POAP
+            </h3>
+            <p className="text-slate-400 text-sm font-mono max-w-md mx-auto">
+              // Acara telah selesai. Tiket NFT Anda kini tersimpan permanen di wallet sebagai bukti kehadiran bersejarah.
+            </p>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="mt-10 text-center">
+          <Link
+            href="/marketplace"
+            className="inline-block font-mono text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-400 transition-colors border border-slate-700 hover:border-cyan-500/40 px-4 py-2 rounded"
+          >
+            {'< KEMBALI KE MARKETPLACE'}
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
 }
