@@ -12,10 +12,10 @@ export default function Navbar() {
     // Mengambil status koneksi wallet asli dari Wagmi
     const { isConnected } = useAccount();
 
-    // Menu dasar saat belum konek wallet
+    // Menu dasar saat belum konek wallet (tanpa Events)
     const baseNavLinks = [
         { name: 'Marketplace', path: '/marketplace' },
-        { name: 'Events', path: '/event' },
+        // { name: 'Events', path: '/event' }, // removed – Marketplace covers events
         { name: 'How It Works', path: '/#how-it-works' },
         { name: 'Docs', path: '/#docs' },
         { name: 'Sign In', path: '/login' },
