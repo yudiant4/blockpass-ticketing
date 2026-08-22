@@ -4,18 +4,20 @@ import { css } from '../../styled-system/css';
 const nfts = [
     {
         name: 'VIP FLOOR #0042',
-        event: 'ELECTRONIC HORIZON FESTIVAL',
+        event: 'NEON CITY RAVE VOL. 4',
+        eventId: 5,
         price: '0.015 ETH',
         badge: 'Legendary',
         badgeClass: css({ borderColor: 'neon3', color: 'neon3' }),
         pass: 'VIP PASS',
         passBorder: css({ borderColor: 'neon', color: 'neon', boxShadow: '0 0 20px rgba(0,245,196,0.25)' }),
-        bg: 'linear-gradient(135deg, #0d1f2d 0%, #0f3d2e 100%)',
+        bg: 'linear-gradient(135deg, #1a0d2d 0%, #2d1a30 100%)',
         hasScan: true,
     },
     {
         name: '42K ULTRA #1088',
         event: 'ALAS TRAIL RUN 2026',
+        eventId: 1,
         price: '0.005 ETH',
         badge: 'VIP Pass',
         badgeClass: css({ borderColor: 'neon', color: 'neon' }),
@@ -27,16 +29,18 @@ const nfts = [
     {
         name: 'SUMMIT PASS #0422',
         event: 'RINJANI EXPEDITION VIP',
+        eventId: 4,
         price: '0.01 ETH',
         badge: 'Legendary',
         badgeClass: css({ borderColor: 'neon3', color: 'neon3' }),
         pass: 'EXPEDITION',
         passBorder: css({ borderColor: 'neon3', color: 'neon3', boxShadow: '0 0 20px rgba(255,61,110,0.25)' }),
-        bg: 'linear-gradient(135deg, #2d0f1a 0%, #1a0f2e 100%)',
+        bg: 'linear-gradient(135deg, #1f1c0d 0%, #302b1a 100%)',
     },
     {
         name: 'FRONT ROW #0118',
-        event: 'NEON CITY RAVE VOL. 3',
+        event: 'NEON CITY RAVE VOL. 4',
+        eventId: 5,
         price: '0.006 ETH',
         badge: 'Epic',
         badgeClass: css({ borderColor: 'neon2', color: 'neon2' }),
@@ -47,6 +51,7 @@ const nfts = [
     {
         name: 'ALL ACCESS #0012',
         event: 'TALUS WEB3 SUMMIT',
+        eventId: 2,
         price: '0.002 ETH',
         badge: 'Tier 1',
         badgeClass: css({ borderColor: 'neon', color: 'neon' }),
@@ -57,6 +62,7 @@ const nfts = [
     {
         name: 'GENERAL #0890',
         event: 'ANIME MATSURI: SOUL SOCIETY',
+        eventId: 3,
         price: '50 MATIC',
         badge: 'General',
         badgeClass: css({ borderColor: 'muted', color: 'muted' }),
@@ -66,7 +72,8 @@ const nfts = [
     },
     {
         name: 'MAIN STAGE #0150',
-        event: 'MANTRA 116 ULTRA',
+        event: 'RINJANI EXPEDITION VIP',
+        eventId: 4,
         price: '0.008 ETH',
         badge: 'Epic',
         badgeClass: css({ borderColor: 'neon2', color: 'neon2' }),
@@ -77,6 +84,7 @@ const nfts = [
     {
         name: 'VIP ARENA #0007',
         event: 'BLOCKPASS ESPORTS ARENA',
+        eventId: 6,
         price: '0.001 ETH',
         badge: 'VIP Pass',
         badgeClass: css({ borderColor: 'neon', color: 'neon' }),
@@ -130,7 +138,7 @@ export default function NFTShowcase() {
                 })}
             >
                 {nfts.map((nft, i) => (
-                    <Link key={i} href="/event" className={css({ textDecoration: 'none', color: 'inherit' })}>
+                    <Link key={i} href={`/event/${nft.eventId}`} className={css({ textDecoration: 'none', color: 'inherit' })}>
                         <div
                             className={css({
                                 background: 'card',
