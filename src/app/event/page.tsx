@@ -68,11 +68,18 @@ export default function EventDetailPage() {
 
         {/* Event Day Ticket Component */}
         <EventDayTicket
-          tokenId={2}
+          tokenId={ticketTiers[selectedTier].id}
           contractAddress="0xbdb5f9745Db186C25424fA0EC5b81009980B87c2"
           ownerAddress="0x8fc179213fb33f2bf61c8abae3d2a469e9f167b9"
-          tier="VIP"
-          perks={['Akses Masuk Utama Event', 'Digital POAP Finisher Badge', 'Free Merchandise NFT']}
+          tier={ticketTiers[selectedTier].name}
+          tierData={{
+            accent: selectedTier === 0 ? 'cyan' : selectedTier === 1 ? 'emerald' : 'amber',
+            glow: selectedTier === 0 ? 'shadow-cyan-500/30' : selectedTier === 1 ? 'shadow-emerald-500/30' : 'shadow-amber-500/30',
+            border: selectedTier === 0 ? 'border-cyan-500/50' : selectedTier === 1 ? 'border-emerald-500/50' : 'border-amber-500/50',
+            badgeBg: selectedTier === 0 ? 'bg-cyan-500/20' : selectedTier === 1 ? 'bg-emerald-500/20' : 'bg-amber-500/20',
+            badgeText: selectedTier === 0 ? 'text-cyan-400' : selectedTier === 1 ? 'text-emerald-400' : 'text-amber-400',
+          }}
+          perks={ticketTiers[selectedTier].benefits}
           status="UNUSED"
         />
 
