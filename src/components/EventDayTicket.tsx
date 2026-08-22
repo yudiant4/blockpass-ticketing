@@ -111,14 +111,16 @@ export default function EventDayTicket({
         </span>
       </div>
 
-      {/* QR Code Section */}
+      {/* QR Code Section - Fixed Layout */}
       {ticketStatus === 'UNUSED' && !isScanning && (
         <div className={css({
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          gap: '4',
           width: 'full',
         })}>
+          {/* QR Container with dramatic effects - Fixed Layout */}
           <div className={css({
             position: 'relative',
             width: '280px',
@@ -229,25 +231,22 @@ export default function EventDayTicket({
                 <Zap className="h-10 w-10 text-cyan-400/30" />
               </div>
             </div>
+          </div>
 
-            {/* Gate pass label */}
-            <div className={css({
-              position: 'absolute',
-              bottom: '8',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              textAlign: 'center',
+          {/* Gate pass label - FIXED: Now BELOW the QR code, not overlapping */}
+          <div className={css({
+            textAlign: 'center',
+            mt: '4',
+          })}>
+            <p className={css({
+              fontFamily: 'mono',
+              fontSize: 'xs',
+              color: 'cyan.400/70',
+              textTransform: 'uppercase',
+              letterSpacing: 'widest',
             })}>
-              <p className={css({
-                fontFamily: 'mono',
-                fontSize: 'xs',
-                color: 'cyan.400/70',
-                textTransform: 'uppercase',
-                letterSpacing: 'widest',
-              })}>
-                GATE PASS READY
-              </p>
-            </div>
+              GATE PASS READY
+            </p>
           </div>
         </div>
       )}

@@ -224,7 +224,7 @@ export default function EventDynamicPage() {
           ))}
         </div>
 
-        {/* Tab Content - Pre-Event */}
+        {/* Tab Content - Pre-Event (Tier Selection Cards) */}
         {activeTab === 'pre' && (
           <div className={css({
             bg: 'card/60',
@@ -277,6 +277,7 @@ export default function EventDynamicPage() {
               {'// Pilih tier & selesaikan transaksi untuk membuka Event Day Gate Pass'}
             </p>
 
+            {/* Tier Cards Grid */}
             <div className={css({
               display: 'grid',
               gridTemplateColumns: { base: '1fr', md: 'repeat(3, 1fr)' },
