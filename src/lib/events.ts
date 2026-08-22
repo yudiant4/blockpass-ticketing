@@ -1,5 +1,41 @@
 // Shared event data for marketplace and event detail pages
-export const marketplaceEvents = [
+
+export interface Tier {
+  id: number;
+  name: string;
+  price: string;
+  fiat: string;
+  network: string;
+  benefits: string[];
+  accent: string;
+  glow: string;
+  border: string;
+  badgeBg: string;
+  badgeText: string;
+}
+
+export interface Event {
+  id: number;
+  title: string;
+  organizer: string;
+  category: string;
+  location: string;
+  date: string;
+  network: string;
+  cryptoPrice: string;
+  fiatPrice: string;
+  status: string;
+  statusColor: string;
+  supply: { minted: number; total: number };
+  rarity: string;
+  action: string;
+  bg: string;
+  trending: boolean;
+  description: string;
+  tiers: Tier[];
+}
+
+export const marketplaceEvents: Event[] = [
   {
     id: 1,
     title: 'ALAS TRAIL RUN 2026',
@@ -17,7 +53,6 @@ export const marketplaceEvents = [
     action: 'Mint Now',
     bg: 'linear-gradient(135deg, #0a2010 0%, #0f3d2e 100%)',
     trending: true,
-    // Detail data for event page
     description: 'Trail run menantang di kaki Gunung Arjuno dengan pemandangan savana Alas Purwo.',
     tiers: [
       { id: 1, name: 'REGULAR', price: '0.001 ETH', fiat: 'Rp 50.000', network: 'Ethereum', benefits: ['Akses Masuk Area Umum', 'Standard Digital Ticket NFT'], accent: 'cyan', glow: 'shadow.cyan.500/30', border: 'border.cyan.500/50', badgeBg: 'bg.cyan.500/20', badgeText: 'text.cyan.400' },
@@ -148,6 +183,6 @@ export const marketplaceEvents = [
 ];
 
 // Helper function to get event by ID
-export function getEventById(id: number) {
-  return marketplaceEvents.find((event) => event.id === id) || marketplaceEvents[0];
+export function getEventById(id: number): Event | undefined {
+  return marketplaceEvents.find((event) => event.id === id);
 }
