@@ -3,9 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { css } from '../../../styled-system/css';
-
-// Mock Data Tiket Lengkap dengan semua parameter
-const marketplaceEvents = [
+import { marketplaceEvents } from '../../lib/events';
     {
         id: 1,
         title: 'ALAS TRAIL RUN 2026',
