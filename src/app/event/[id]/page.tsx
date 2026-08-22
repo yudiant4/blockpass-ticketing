@@ -20,21 +20,18 @@ const ticketTiers = [
     name: 'REGULAR',
     price: '0.001 ETH',
     network: 'Ethereum',
-    statusColor: 'cyan',
   },
   {
     id: 2,
     name: 'VIP',
     price: '0.003 ETH',
     network: 'Ethereum',
-    statusColor: 'cyan',
   },
   {
     id: 3,
     name: 'VVIP',
     price: '0.01 ETH',
     network: 'Ethereum',
-    statusColor: 'emerald',
   },
 ];
 
@@ -57,7 +54,7 @@ export default function EventDynamicPage() {
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-24">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="inline-block px-3 py-1 border border-cyan-500/40 rounded-md font-mono text-[10px] uppercase tracking-[0.3em] text-cyan-400 mb-4">
+          <div className="inline-block px-3 py-1 border border-cyan-500/40 rounded-md font-mono text-xs uppercase tracking-widest text-cyan-400 mb-4">
             Event #{eventId} • NFT Ticketing
           </div>
           <h1 className="text-3xl md:text-4xl font-bold uppercase text-white tracking-wide">
@@ -78,9 +75,9 @@ export default function EventDynamicPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as 'pre' | 'day' | 'post')}
-              className={`flex-1 px-4 py-2.5 rounded-lg font-mono text-[11px] font-bold uppercase tracking-widest transition-all ${
+              className={`flex-1 px-4 py-2.5 rounded-lg font-mono text-xs font-bold uppercase tracking-widest transition-all ${
                 activeTab === tab.key
-                  ? 'bg-cyan-500 text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.4)]'
+                  ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20'
                   : 'bg-slate-950/60 text-slate-400 border border-cyan-500/20 hover:text-cyan-400 hover:border-cyan-500/60'
               }`}
             >
@@ -94,7 +91,7 @@ export default function EventDynamicPage() {
           <div className="bg-slate-900/80 border border-cyan-500/40 rounded-2xl p-6 backdrop-blur">
             <div className="flex items-center gap-2 mb-4">
               <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-cyan-400">
+              <span className="font-mono text-xs uppercase tracking-widest text-cyan-400">
                 Tier Selection
               </span>
             </div>
@@ -111,20 +108,20 @@ export default function EventDynamicPage() {
                   onClick={() => setSelectedTier(tier.id)}
                   className={`p-4 rounded-xl text-left transition-all bg-slate-950/60 backdrop-blur ${
                     selectedTier === tier.id
-                      ? 'border border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.25)]'
+                      ? 'border-2 border-cyan-400 shadow-lg shadow-cyan-500/20'
                       : 'border border-cyan-500/20 hover:border-cyan-500/60'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-400 border border-cyan-500/40 px-2 py-0.5 rounded">
+                    <span className="font-mono text-xs uppercase tracking-widest text-cyan-400 border border-cyan-500/40 px-2 py-0.5 rounded">
                       {tier.name} PASS
                     </span>
-                    <span className="font-mono text-[10px] text-emerald-400 uppercase">
+                    <span className="font-mono text-xs text-emerald-400 uppercase">
                       {tier.network}
                     </span>
                   </div>
                   <div className="text-2xl font-bold text-white font-mono">{tier.price}</div>
-                  <div className="text-[10px] text-slate-500 font-mono mt-1">
+                  <div className="text-xs text-slate-500 font-mono mt-1">
                     ≈ Rp{' '}
                     {tier.id === 1 ? '50.000' : tier.id === 2 ? '150.000' : '500.000'}
                   </div>
@@ -132,11 +129,11 @@ export default function EventDynamicPage() {
               ))}
             </div>
 
-            <button className="w-full py-3 px-6 bg-cyan-500 text-slate-950 font-mono text-xs font-bold uppercase tracking-[0.2em] rounded-lg hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+            <button className="w-full py-3 px-6 bg-cyan-500 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20">
               {'>'} MINT TIKET SEKARANG
             </button>
 
-            <div className="mt-4 p-3 bg-slate-950/60 border border-cyan-500/20 rounded-lg font-mono text-[10px] text-slate-400">
+            <div className="mt-4 p-3 bg-slate-950/60 border border-cyan-500/20 rounded-lg font-mono text-xs text-slate-400">
               <span className="text-cyan-400">// STATUS:</span> Wallet belum terhubung. Klik
               "Connect Wallet" di header untuk mulai mint.
             </div>
@@ -156,7 +153,7 @@ export default function EventDynamicPage() {
 
         {activeTab === 'post' && (
           <div className="bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-8 text-center backdrop-blur">
-            <div className="inline-block px-3 py-1 border border-emerald-500/40 rounded-md font-mono text-[10px] uppercase tracking-[0.3em] text-emerald-400 mb-4">
+            <div className="inline-block px-3 py-1 border border-emerald-500/40 rounded-md font-mono text-xs uppercase tracking-widest text-emerald-400 mb-4">
               FINISHER POAP
             </div>
             <h3 className="text-2xl font-bold uppercase text-white mb-2">
@@ -173,7 +170,7 @@ export default function EventDynamicPage() {
         <div className="mt-10 text-center">
           <Link
             href="/marketplace"
-            className="inline-block font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500 hover:text-cyan-400 transition-colors border border-slate-700 hover:border-cyan-500/40 px-4 py-2 rounded"
+            className="inline-block font-mono text-xs uppercase tracking-widest text-slate-500 hover:text-cyan-400 transition-colors border border-slate-700 hover:border-cyan-500/40 px-4 py-2 rounded"
           >
             {'< KEMBALI KE MARKETPLACE'}
           </Link>

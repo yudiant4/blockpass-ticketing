@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { CheckCircle, XCircle, Zap } from 'lucide-react';
+import { CheckCircle, Zap } from 'lucide-react';
 
 interface EventDayTicketProps {
   tokenId: string | number;
   contractAddress: string;
   ownerAddress: string;
   tier: string;
-  perks: string[]; // array of perk descriptions
+  perks: string[];
   status: 'UNUSED' | 'USED';
 }
 
@@ -34,7 +34,6 @@ export default function EventDayTicket({
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 1500));
     // TODO: Call Web3 function here to mark ticket as used on-chain
-    // Example: await writeContract({ address: contractAddress, abi, functionName: 'useTicket', args: [tokenId] });
     setTicketStatus('USED');
     setIsScanning(false);
   };
@@ -46,17 +45,17 @@ export default function EventDayTicket({
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 flex flex-col items-center justify-center gap-6">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 flex flex-col items-center justify-center gap-6">
       {/* Header with status badge */}
       <div className="w-full flex justify-between items-center">
-        <h2 className="text-xl font-bold text-mint-green">
+        <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest">
           Event Day Ticket
         </h2>
         <span
           className={`px-3 py-1 rounded-full text-sm font-medium ${
             ticketStatus === 'UNUSED'
-              ? 'bg-green-600/20 text-green-400'
-              : 'bg-slate-600/20 text-slate-400'
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+              : 'bg-slate-600/20 text-slate-400 border border-slate-600'
           }`}
         >
           {ticketStatus}
@@ -66,7 +65,7 @@ export default function EventDayTicket({
       {/* QR Code Section (only show if UNUSED) */}
       {ticketStatus === 'UNUSED' && !isScanning && (
         <div className="flex items-center justify-center w-full">
-          <div className="relative w-[260px] h-[260px]">
+          <div className="relative w-[260px] h-[260px] bg-slate-900/80 border border-cyan-500/40 rounded-xl p-4 backdrop-blur">
             <QRCodeSVG
               value={qrData}
               size={260}
@@ -77,7 +76,7 @@ export default function EventDayTicket({
             />
             {/* Optional decorative overlay */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <Zap className="h-8 w-8 text-mint-green/50" />
+              <Zap className="h-8 w-8 text-cyan-400/50" />
             </div>
           </div>
         </div>
@@ -86,33 +85,33 @@ export default function EventDayTicket({
       {/* Used state success icon */}
       {ticketStatus === 'USED' && (
         <div className="flex items-center justify-center space-x-4">
-          <CheckCircle className="h-12 w-12 text-green-400" />
-          <p className="text-lg font-medium">
+          <CheckCircle className="h-12 w-12 text-emerald-400" />
+          <p className="text-lg font-medium text-white">
             Ticket Successfully Used
           </p>
         </div>
       )}
 
       {/* Metadata Card */}
-      <div className="w-full bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 space-y-4 border border-slate-700">
+      <div className="w-full max-w-md bg-slate-900/80 border border-cyan-500/40 rounded-2xl p-6 space-y-4 backdrop-blur">
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-400">Token ID</p>
-          <p className="text-xl font-mono text-mint-green">{tokenId}</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Token ID</p>
+          <p className="text-2xl font-bold font-mono text-cyan-400">{tokenId}</p>
         </div>
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-400">Contract</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Contract</p>
           <p className="text-xs font-mono text-slate-300 break-all">{contractAddress}</p>
         </div>
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-400">Tier</p>
-          <p className="text-lg font-semibold text-purple-400">{tier}</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Tier</p>
+          <p className="text-lg font-bold text-emerald-400 uppercase">{tier}</p>
         </div>
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-400">Perks</p>
-          <ul className="space-y-1 text-slate-300">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Perks</p>
+          <ul className="space-y-2 text-slate-300 font-mono text-sm">
             {perks.map((perk, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="flex h-3 w-3 shrink-0 bg-mint-green/20 rounded"></span>
+              <li key={idx} className="flex items-center gap-2 p-2 bg-slate-950/60 border border-cyan-500/20 rounded-lg">
+                <span className="w-2 h-2 bg-cyan-400 rounded"></span>
                 <span>{perk}</span>
               </li>
             ))}
@@ -121,25 +120,16 @@ export default function EventDayTicket({
       </div>
 
       {/* Action Buttons */}
-      <div className="w-full space-y-4">
+      <div className="w-full max-w-md space-y-3">
         {/* Scan QR Button (only if UNUSED and not scanning) */}
         {ticketStatus === 'UNUSED' && !isScanning && (
           <button
             onClick={handleScan}
             disabled={isScanning}
-            className="w-full py-3 px-6 bg-mint-green text-slate-900 font-semibold rounded-lg hover:bg-mint-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 px-6 bg-cyan-500 text-slate-950 font-bold rounded-lg hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2"
           >
-            {isScanning ? (
-              <>
-                <Zap className="h-4 w-4 animate-spin" />
-                <span>Scanning...</span>
-              </>
-            ) : (
-              <>
-                <Zap className="h-4 w-4" />
-                <span>SCAN QR AT GATE</span>
-              </>
-            )}
+            <Zap className="h-4 w-4" />
+            <span>SCAN QR AT GATE</span>
           </button>
         )}
 
@@ -147,7 +137,7 @@ export default function EventDayTicket({
         <button
           onClick={handleClaim}
           disabled={isPerkClaimed}
-          className={`w-full py-3 px-6 bg-purple-600/20 text-purple-400 font-semibold rounded-lg border border-purple-600/30 hover:bg-purple-600/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+          className="w-full py-3 px-6 bg-emerald-500/20 text-emerald-400 font-bold rounded-lg border border-emerald-500/40 hover:bg-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isPerkClaimed ? (
             <>
@@ -165,10 +155,10 @@ export default function EventDayTicket({
 
       {/* Loading overlay when scanning */}
       {isScanning && (
-        <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="text-center">
-            <Zap className="h-6 w-6 text-mint-green animate-spin" />
-            <p className="mt-2 text-sm text-slate-400">Verifying ticket at gate...</p>
+            <Zap className="h-6 w-6 text-cyan-400 animate-spin" />
+            <p className="mt-2 text-sm text-slate-400 font-mono">Verifying ticket at gate...</p>
           </div>
         </div>
       )}
