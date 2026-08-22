@@ -31,39 +31,26 @@ export default function EventDayTicket({
   status,
 }: EventDayTicketProps) {
   const [ticketStatus, setTicketStatus] = useState<'UNUSED' | 'USED'>(status);
-  const [isPerkClaimed, setIsPerkClaimed] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
-
   const qrData = `${contractAddress}-${tokenId}-${ownerAddress}`;
 
-  useEffect(() => {
-    if (isScanning) {
-      const interval = setInterval(() => {
-        setScanProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 2;
-        });
-      }, 50);
-      return () => clearInterval(interval);
-    } else {
-      setScanProgress(0);
-    }
-  }, [isScanning]);
-
-  const handleScan = async () => {
+  // Simulate a scan process when user clicks QR (for demo)
+  const startScan = async () => {
     setIsScanning(true);
     setScanProgress(0);
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    const interval = setInterval(() => {
+      setScanProgress((p) => {
+        if (p >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return p + 2;
+      });
+    }, 50);
+    await new Promise((r) => setTimeout(r, 2500));
     setTicketStatus('USED');
     setIsScanning(false);
-  };
-
-  const handleClaim = () => {
-    setIsPerkClaimed(true);
   };
 
   return (
@@ -78,7 +65,7 @@ export default function EventDayTicket({
       justifyContent: 'center',
       gap: '6',
     })}>
-      {/* Header with status badge */}
+      {/* Header */}
       <div className={css({
         width: 'full',
         maxWidth: 'md',
@@ -90,11 +77,9 @@ export default function EventDayTicket({
           fontSize: 'xl',
           fontWeight: 'bold',
           textTransform: 'uppercase',
-          color: 'cyan',
-          letterSpacing: 'widest',
-        })}>
-          Event Day Ticket
-        </h2>
+          color: 'neon',
+          letterSpacing: '0.3em',
+        })}>Event Day Ticket</h2>
         <span className={css({
           px: '3',
           py: '1',
@@ -111,7 +96,7 @@ export default function EventDayTicket({
         </span>
       </div>
 
-      {/* QR Code Section - Fixed Layout */}
+      {/* QR Section – clean layout */}
       {ticketStatus === 'UNUSED' && !isScanning && (
         <div className={css({
           display: 'flex',
@@ -120,24 +105,23 @@ export default function EventDayTicket({
           gap: '4',
           width: 'full',
         })}>
-          {/* QR Container with dramatic effects - Fixed Layout */}
+          {/* QR container */}
           <div className={css({
             position: 'relative',
-            width: '280px',
-            height: '280px',
+            width: '260px',
+            height: '260px',
           })}>
-            {/* Outer glow ring */}
+            {/* outer cyan ring */}
             <div className={css({
               position: 'absolute',
               inset: '0',
               borderWidth: '2px',
               borderStyle: 'solid',
-              borderColor: 'cyan.500/30',
+              borderColor: 'cyan.500/20',
               borderRadius: 'xl',
-              animation: 'pulseBlob 2s infinite',
+              animation: 'pulseBlob 3s infinite',
             })} />
-
-            {/* Inner container */}
+            {/* inner card */}
             <div className={css({
               position: 'relative',
               width: 'full',
@@ -151,7 +135,7 @@ export default function EventDayTicket({
               backdropFilter: 'blur(20px)',
               overflow: 'hidden',
             })}>
-              {/* Corner brackets */}
+              {/* corner brackets */}
               <div className={css({
                 position: 'absolute',
                 top: '-1',
@@ -201,7 +185,7 @@ export default function EventDayTicket({
                 borderBottomRightRadius: 'xl',
               })} />
 
-              {/* QR Code */}
+              {/* QR code */}
               <div className={css({
                 position: 'absolute',
                 inset: '4',
@@ -211,7 +195,7 @@ export default function EventDayTicket({
               })}>
                 <QRCodeSVG
                   value={qrData}
-                  size={240}
+                  size={230}
                   bgColor="transparent"
                   fgColor="#00FFA3"
                   level="Q"
@@ -219,7 +203,7 @@ export default function EventDayTicket({
                 />
               </div>
 
-              {/* Decorative center overlay */}
+              {/* small zap overlay */}
               <div className={css({
                 position: 'absolute',
                 inset: '0',
@@ -228,22 +212,20 @@ export default function EventDayTicket({
                 justifyContent: 'center',
                 pointerEvents: 'none',
               })}>
-                <Zap className="h-10 w-10 text-cyan-400/30" />
+                <Zap className="h-8 w-8 text-cyan-400/30" />
               </div>
             </div>
           </div>
 
-          {/* Gate pass label - FIXED: Now BELOW the QR code, not overlapping */}
-          <div className={css({
-            textAlign: 'center',
-            mt: '4',
-          })}>
+          {/* Status text below QR */}
+          <div className={css({ textAlign: 'center', mt: '3' })}>
             <p className={css({
               fontFamily: 'mono',
-              fontSize: 'xs',
-              color: 'cyan.400/70',
+              fontSize: 'sm',
+              fontWeight: 'semibold',
+              color: 'cyan.300',
               textTransform: 'uppercase',
-              letterSpacing: 'widest',
+              letterSpacing: '0.15em',
             })}>
               GATE PASS READY
             </p>
@@ -251,7 +233,7 @@ export default function EventDayTicket({
         </div>
       )}
 
-      {/* Scanning Animation Overlay */}
+      {/* Scanning overlay */}
       {isScanning && (
         <div className={css({
           position: 'fixed',
@@ -259,15 +241,14 @@ export default function EventDayTicket({
           bg: 'bg/90',
           backdropFilter: 'blur(8px)',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: '50',
         })}>
           <div className={css({
             position: 'relative',
-            width: '280px',
-            height: '280px',
+            width: '260px',
+            height: '260px',
           })}>
             <div className={css({
               position: 'absolute',
@@ -285,8 +266,8 @@ export default function EventDayTicket({
               justifyContent: 'center',
             })}>
               <div className={css({
-                width: '240px',
-                height: '240px',
+                width: '230px',
+                height: '230px',
                 bg: 'card/80',
                 borderRadius: 'xl',
                 display: 'flex',
@@ -295,7 +276,7 @@ export default function EventDayTicket({
                 justifyContent: 'center',
                 p: '6',
               })}>
-                <Zap className="h-12 w-12 text-cyan-400 animate-spin mb-4" />
+                <Zap className="h-10 w-10 text-cyan-400 animate-spin mb-4" />
                 <p className={css({
                   fontFamily: 'mono',
                   fontSize: 'sm',
@@ -337,13 +318,12 @@ export default function EventDayTicket({
         </div>
       )}
 
-      {/* Used state success icon */}
+      {/* Used state */}
       {ticketStatus === 'USED' && (
         <div className={css({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
           gap: '4',
         })}>
           <div className={css({ position: 'relative' })}>
@@ -358,17 +338,13 @@ export default function EventDayTicket({
               animation: 'pulseBlob 2s infinite',
             })} />
           </div>
-          <p className={css({
-            fontSize: 'xl',
-            fontWeight: 'bold',
-            color: 'text',
-          })}>
+          <p className={css({ fontSize: 'xl', fontWeight: 'bold', color: 'text' })}>
             Ticket Successfully Used
           </p>
         </div>
       )}
 
-      {/* Metadata Card */}
+      {/* Metadata Card – reduce vertical padding */}
       <div className={css({
         width: 'full',
         maxWidth: 'md',
@@ -377,7 +353,7 @@ export default function EventDayTicket({
         borderStyle: 'solid',
         borderColor: 'cyan.500/30',
         borderRadius: '2xl',
-        p: '6',
+        p: '4', // reduced from 6
         backdropFilter: 'blur(20px)',
         display: 'flex',
         flexDirection: 'column',
@@ -390,19 +366,14 @@ export default function EventDayTicket({
             color: 'text',
             textTransform: 'uppercase',
             letterSpacing: 'widest',
-          })}>
-            Token ID
-          </p>
+          })}>Token ID</p>
           <p className={css({
             fontSize: '3xl',
             fontWeight: 'bold',
             fontFamily: 'mono',
             color: 'cyan',
-          })}>
-            {tokenId}
-          </p>
+          })}>{tokenId}</p>
         </div>
-
         <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
           <p className={css({
             fontSize: 'xs',
@@ -410,18 +381,11 @@ export default function EventDayTicket({
             color: 'text',
             textTransform: 'uppercase',
             letterSpacing: 'widest',
-          })}>
-            Contract
-          </p>
-          <p className={css({
-            fontSize: 'xs',
-            fontFamily: 'mono',
-            color: 'text',
-          })}>
+          })}>Contract</p>
+          <p className={css({ fontSize: 'xs', fontFamily: 'mono', color: 'text' })}>
             {contractAddress}
           </p>
         </div>
-
         <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
           <p className={css({
             fontSize: 'xs',
@@ -429,19 +393,14 @@ export default function EventDayTicket({
             color: 'text',
             textTransform: 'uppercase',
             letterSpacing: 'widest',
-          })}>
-            Tier
-          </p>
+          })}>Tier</p>
           <p className={css({
             fontSize: 'lg',
             fontWeight: 'bold',
             color: 'emerald',
             textTransform: 'uppercase',
-          })}>
-            {tier}
-          </p>
+          })}>{tier}</p>
         </div>
-
         <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
           <p className={css({
             fontSize: 'xs',
@@ -449,9 +408,7 @@ export default function EventDayTicket({
             color: 'text',
             textTransform: 'uppercase',
             letterSpacing: 'widest',
-          })}>
-            Perks
-          </p>
+          })}>Perks</p>
           <ul className={css({
             display: 'flex',
             flexDirection: 'column',
@@ -473,105 +430,15 @@ export default function EventDayTicket({
                   borderStyle: 'solid',
                   borderColor: 'cyan.500/20',
                   borderRadius: 'lg',
-                  _hover: {
-                    borderColor: 'cyan.500/50',
-                  },
+                  _hover: { borderColor: 'cyan.500/50' },
                 })}
               >
-                <span className={css({
-                  width: '2',
-                  height: '2',
-                  bg: 'cyan.400',
-                  borderRadius: 'full',
-                })} />
+                <span className={css({ width: '2', height: '2', bg: 'cyan.400', borderRadius: 'full' })} />
                 <span>{perk}</span>
               </li>
             ))}
           </ul>
         </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className={css({
-        width: 'full',
-        maxWidth: 'md',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '3',
-      })}>
-        {ticketStatus === 'UNUSED' && !isScanning && (
-          <button
-            onClick={handleScan}
-            disabled={isScanning}
-            className={css({
-              width: 'full',
-              py: '4',
-              px: '6',
-              bg: 'cyan',
-              color: 'bg',
-              fontWeight: 'bold',
-              borderRadius: 'lg',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 200ms',
-              boxShadow: 'shadow.cyan.500/30',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2',
-              _hover: {
-                bg: 'cyan.400',
-                boxShadow: 'shadow.cyan.500/40',
-              },
-            })}
-          >
-            <Zap className="h-5 w-5" />
-            <span>SCAN QR AT GATE</span>
-          </button>
-        )}
-
-        <button
-          onClick={handleClaim}
-          disabled={isPerkClaimed}
-          className={css({
-            width: 'full',
-            py: '4',
-            px: '6',
-            bg: 'emerald.500/20',
-            color: 'emerald.400',
-            fontWeight: 'bold',
-            borderRadius: 'lg',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: 'emerald.500/40',
-            cursor: 'pointer',
-            transition: 'all 200ms',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '2',
-            _hover: {
-              bg: 'emerald.500/30',
-              borderColor: 'emerald.500/60',
-            },
-            _disabled: {
-              opacity: '0.5',
-              cursor: 'not-allowed',
-            },
-          })}
-        >
-          {isPerkClaimed ? (
-            <>
-              <CheckCircle className="h-5 w-5" />
-              <span>Perks Claimed</span>
-            </>
-          ) : (
-            <>
-              <Zap className="h-5 w-5" />
-              <span>Claim Perks</span>
-            </>
-          )}
-        </button>
       </div>
     </div>
   );

@@ -35,9 +35,9 @@ export default function EventDetailPage() {
     return (
       <main className={css({ minHeight: '100vh', bg: 'bg', color: 'text' })}>
         <div className={css({ textAlign: 'center', py: '20' })}>
-          <h2 className={css({ fontSize: '2xl', fontWeight: 'bold', textTransform: 'uppercase', color: 'text' })}>Event Not Found</h2>
+          <h2 className={css({ fontSize: '2xl', fontWeight: '800', textTransform: 'uppercase', color: 'text', letterSpacing: '-0.03em' })}>Event Not Found</h2>
           <p className={css({ mt: '4', color: 'text', fontFamily: 'mono' })}>Event with ID {eventId} does not exist.</p>
-          <Link href="/" className={css({ display: 'inline-block', mt: '6', px: '4', py: '2', bg: 'cyan', color: 'bg', fontFamily: 'mono', fontSize: 'xs', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 'widest', borderRadius: 'lg' })}>← Back to Marketplace</Link>
+          <Link href="/" className={css({ display: 'inline-block', mt: '6', px: '6', py: '3', bg: 'neon', color: 'bg', fontFamily: 'mono', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: 'lg', transition: 'box-shadow 0.2s, transform 0.15s', _hover: { boxShadow: '0 0 40px rgba(0,245,196,0.5)', transform: 'translateY(-2px)' } })}>← Back to Marketplace</Link>
         </div>
       </main>
     );
@@ -83,29 +83,28 @@ export default function EventDetailPage() {
             borderColor: 'border',
             borderRadius: 'md',
             fontFamily: 'mono',
-            fontSize: 'xs',
+            fontSize: '11px',
             textTransform: 'uppercase',
-            letterSpacing: 'widest',
-            color: 'cyan',
+            letterSpacing: '0.3em',
+            color: 'neon',
             mb: '4',
-          })}>
+          })} >
             {`Event #${event.id} • NFT Ticketing`}
           </div>
           <h1 className={css({
-            fontSize: { base: '3xl', md: '4xl' },
-            fontWeight: 'bold',
+            fontSize: { base: '3xl', md: '4xl', lg: '5xl' },
+            fontWeight: '800',
             textTransform: 'uppercase',
             color: 'text',
-            letterSpacing: 'wide',
+            letterSpacing: '-0.03em',
+            lineHeight: '0.95',
           })}>
             {event.title}
           </h1>
-          <p className={css({ mt: '3', fontSize: 'sm', color: 'text', fontFamily: 'mono' })}>
+          <p className={css({ mt: '3', fontSize: 'sm', color: 'muted', fontFamily: 'mono' })}>
             {event.location} • <span className={css({ color: 'emerald' })}>{event.date}</span>
           </p>
-          <p className={css({ mt: '2', fontSize: 'sm', color: 'text', fontFamily: 'mono' })}>
-            {event.description}
-          </p>
+          <p className={css({ mt: '2', fontSize: 'sm', color: 'muted', fontFamily: 'mono' })}>{event.description}</p>
         </div>
 
         {/* Tab Navigation */}
@@ -121,7 +120,7 @@ export default function EventDetailPage() {
           borderColor: 'border',
           borderRadius: 'xl',
           backdropFilter: 'blur(20px)',
-        })}>
+        })} >
           {[
             { key: 'pre', label: '01 // PRE-EVENT' },
             { key: 'day', label: '02 // EVENT DAY' },
@@ -136,16 +135,16 @@ export default function EventDetailPage() {
                 py: '2.5',
                 borderRadius: 'lg',
                 fontFamily: 'mono',
-                fontSize: 'xs',
-                fontWeight: 'bold',
+                fontSize: '11px',
+                fontWeight: '700',
                 textTransform: 'uppercase',
-                letterSpacing: 'widest',
+                letterSpacing: '0.08em',
                 transition: 'all 200ms',
                 cursor: 'pointer',
-                bg: activeTab === tab.key ? 'cyan' : 'card/60',
+                bg: activeTab === tab.key ? 'neon' : 'card/60',
                 color: activeTab === tab.key ? 'bg' : 'text',
-                boxShadow: activeTab === tab.key ? 'shadow.cyan.500/30' : 'none',
-                _hover: { bg: activeTab === tab.key ? 'cyan' : 'cyan.500/10', color: activeTab === tab.key ? 'bg' : 'cyan' },
+                boxShadow: activeTab === tab.key ? '0 0 30px rgba(0,245,196,0.4)' : 'none',
+                _hover: { bg: activeTab === tab.key ? 'neon' : 'rgba(0,245,196,0.1)', color: activeTab === tab.key ? 'bg' : 'neon', boxShadow: activeTab === tab.key ? '0 0 40px rgba(0,245,196,0.5)' : '0 0 20px rgba(0,245,196,0.2)' },
               })}
             >
               {tab.label}
@@ -156,11 +155,9 @@ export default function EventDetailPage() {
         {/* Pre-Event tier selection */}
         {activeTab === 'pre' && (
           <div className={css({ bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: '2xl', p: '6', backdropFilter: 'blur(20px)' })}>
-            <h2 className={css({ fontSize: 'xl', fontWeight: 'bold', textTransform: 'uppercase', color: 'text', mb: '1' })}>Select Your Tier</h2>
-            <p className={css({ fontSize: 'xs', color: 'text', fontFamily: 'mono', mb: '6' })}>
-              {'// Pilih tier & selesaikan transaksi untuk membuka Event Day Gate Pass'}
-            </p>
-            <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', md: 'repeat(3, 1fr)' }, gap: '4', mb: '6' })}>
+            <h2 className={css({ fontSize: 'xl', fontWeight: '800', textTransform: 'uppercase', color: 'text', mb: '1', letterSpacing: '-0.02em' })}>Select Your Tier</h2>
+            <p className={css({ fontSize: '11px', color: 'muted', fontFamily: 'mono', mb: '6', letterSpacing: '0.05em' })}>{'// Pilih tier & selesaikan transaksi untuk membuka Event Day Gate Pass'}</p>
+            <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', md: 'repeat(3, 1fr)' }, gap: '4', mb: '6' })} >
               {event.tiers.map((tier, idx) => (
                 <button
                   key={tier.id}
@@ -185,28 +182,22 @@ export default function EventDetailPage() {
                 >
                   {/* Accent bar */}
                   <div className={css({ position: 'absolute', left: '0', top: '0', bottom: '0', width: '1', bg: 'gradient-to-b from-cyan.500 via-emerald.500 to-amber.500' })} />
-                  <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2' })}>
-                    <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: 'widest', px: '2', py: '0.5', borderWidth: '1px', borderStyle: 'solid', borderColor: tier.border, color: tier.badgeText, bg: tier.badgeBg, borderRadius: 'md' })}>
+                  <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2' })} >
+                    <span className={css({ fontFamily: 'mono', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', px: '2', py: '0.5', borderWidth: '1px', borderStyle: 'solid', borderColor: tier.border, color: tier.badgeText, bg: tier.badgeBg, borderRadius: 'md' })} >
                       {`${tier.name} PASS`}
                     </span>
-                    <span className={css({ fontFamily: 'mono', fontSize: 'xs', color: 'emerald', textTransform: 'uppercase' })}>
+                    <span className={css({ fontFamily: 'mono', fontSize: '11px', color: 'emerald', textTransform: 'uppercase', letterSpacing: '0.05em' })} >
                       {tier.network}
                     </span>
                   </div>
-                  <div className={css({ fontSize: '2xl', fontWeight: 'bold', fontFamily: 'mono', color: 'text' })}>
-                    {tier.price}
-                  </div>
-                  <div className={css({ mt: '1', fontSize: 'xs', color: 'text', fontFamily: 'mono' })}>
-                    {`≈ Rp ${tier.fiat}`}
-                  </div>
+                  <div className={css({ fontSize: '2xl', fontWeight: '800', fontFamily: 'mono', color: 'text' })}>{tier.price}</div>
+                  <div className={css({ mt: '1', fontSize: 'sm', color: 'muted', fontFamily: 'mono' })}>{`≈ Rp ${tier.fiat}`}</div>
                 </button>
               ))}
             </div>
-            <button className={css({ width: 'full', py: '3', px: '6', bg: 'cyan', color: 'bg', fontFamily: 'mono', fontSize: 'xs', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 'wider', borderRadius: 'lg', cursor: 'pointer', border: 'none', transition: 'all 200ms', boxShadow: 'shadow.cyan.500/30', _hover: { bg: 'cyan.400', boxShadow: 'shadow.cyan.500/40' } })}>
-              {'> MINT TIKET SEKARANG'}
-            </button>
-            <div className={css({ mt: '4', p: '3', bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: 'lg', fontFamily: 'mono', fontSize: 'xs', color: 'text' })}>
-              <span className={css({ color: 'cyan' })}>// STATUS:</span> Wallet belum terhubung. Klik <span className={css({ color: 'cyan' })}>"Connect Wallet"</span> di header untuk mulai mint.
+            <button className={css({ width: 'full', py: '3.5', px: '6', bg: 'neon', color: 'bg', fontFamily: 'mono', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: 'lg', cursor: 'pointer', border: 'none', transition: 'box-shadow 0.2s, transform 0.15s', _hover: { boxShadow: '0 0 40px rgba(0,245,196,0.5)', transform: 'translateY(-2px)' } })}>{'> MINT TIKET SEKARANG'}</button>
+            <div className={css({ mt: '4', p: '3', bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: 'lg', fontFamily: 'mono', fontSize: '11px', color: 'muted' })} >
+              <span className={css({ color: 'neon' })}>// STATUS:</span> Wallet belum terhubung. Klik <span className={css({ color: 'neon' })}>"Connect Wallet"</span> di header untuk mulai mint.
             </div>
           </div>
         )}
@@ -226,14 +217,14 @@ export default function EventDetailPage() {
 
         {/* Post-Event placeholder */}
         {activeTab === 'post' && (
-          <div className={css({ bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: '2xl', p: '8', textAlign: 'center', backdropFilter: 'blur(20px)' })}>
-            <h3 className={css({ fontSize: '2xl', fontWeight: 'bold', textTransform: 'uppercase', color: 'text' })}>Post Event Details</h3>
+          <div className={css({ bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: '2xl', p: '8', textAlign: 'center', backdropFilter: 'blur(20px)' })} >
+            <h3 className={css({ fontSize: '2xl', fontWeight: '800', textTransform: 'uppercase', color: 'text', letterSpacing: '-0.02em' })}>Post Event Details</h3>
           </div>
         )}
 
         {/* Footer */}
-        <div className={css({ mt: '10', textAlign: 'center' })}>
-          <Link href="/marketplace" className={css({ display: 'inline-block', fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: 'widest', color: 'text', transition: 'all 200ms', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', px: '4', py: '2', borderRadius: 'md', textDecoration: 'none', _hover: { borderColor: 'cyan', color: 'cyan' } })}>
+        <div className={css({ mt: '10', textAlign: 'center' })} >
+          <Link href="/marketplace" className={css({ display: 'inline-block', fontFamily: 'mono', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'text', transition: 'all 200ms', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', px: '4', py: '2', borderRadius: 'md', textDecoration: 'none', _hover: { borderColor: 'neon', color: 'neon' } })} >
             {'< KEMBALI KE MARKETPLACE'}
           </Link>
         </div>
