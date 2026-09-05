@@ -1,234 +1,216 @@
-'use client';
+import { css } from '../../../styled-system/css';
+import { getTimeRemaining, isEventDay, isPostEvent, tierLabel, tierPriceETH, TIER_LABELS } from '../../../lib/events';
+import EventDayTicket from '../../components/EventDayTicket';
+import { getUserBalance } from '../../../lib/blockpass';
+import { createPublicClient } from 'viem';
+import { BASE_SEPOLIA, BLOCKPASS_TICKET_ADDRESS, BLOCKPASS_TICKET_ABI } from '../../../config/contracts';
 
-import { useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { css } from 'styled-system/css';
-import dynamic from 'next/dynamic';
-import { getEventById } from '@/lib/events';
+// Mock event data - in production, fetch from API
+const event = {
+  id: '1',
+  title: 'Web3 Dev Connect',
+  description: 'Conference untuk pengembang Web3 dengan workshop, panel diskusi, dan networking.',
+  date: new Date('2025-01-20T10:00:00+07:00'),
+  time: '10:00 - 18:00',
+  location: 'Jl. Sudirman No. 123, Jakarta',
+  venue: 'Ballroom A, Hotel Indonesia',
+  tierPricing: {
+    regular: { price: 0.001, supply: 100, sold: 45 },
+    vip: { price: 0.003, supply: 50, sold: 12 },
+    vvip: { price: 0.01, supply: 20, sold: 5 },
+  },
+  isActive: true,
+};
 
-const EventDayTicket = dynamic(() => import('@/components/EventDayTicket'), {
-  ssr: false,
-  loading: () => (
-    <div className={css({
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '64',
-      color: 'cyan',
-      fontFamily: 'mono',
-      fontSize: 'xs',
-      textTransform: 'uppercase',
-      letterSpacing: 'widest',
-    })}>
-      {'// Loading Gate...'}
-    </div>
-  ),
-});
+export default function EventDetailPage({ params }: { params: { id: string } }) {
+  const timeRemaining = getTimeRemaining(event.date);
+  const eventDayStatus = {
+    isEventDay: isEventDay(event.date, '10:00', '18:00'),
+    isPostEvent: isPostEvent(event.date),
+  };
 
-export default function EventDetailPage() {
-  const params = useParams();
-  const eventId = params?.id ? parseInt(params.id as string, 10) : 1;
-  const event = getEventById(eventId);
+  const handleValidTicket = (wallet: string) => {
+    console.log('Ticket valid untuk wallet:', wallet);
+  };
 
-  if (!event) {
-    return (
-      <main className={css({ minHeight: '100vh', bg: 'bg', color: 'text' })}>
-        <div className={css({ textAlign: 'center', py: '20' })}>
-          <h2 className={css({ fontSize: '2xl', fontWeight: '800', textTransform: 'uppercase', color: 'text', letterSpacing: '-0.03em' })}>Event Not Found</h2>
-          <p className={css({ mt: '4', color: 'text', fontFamily: 'mono' })}>Event with ID {eventId} does not exist.</p>
-          <Link href="/" className={css({ display: 'inline-block', mt: '6', px: '6', py: '3', bg: 'neon', color: 'bg', fontFamily: 'mono', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: 'lg', transition: 'box-shadow 0.2s, transform 0.15s', _hover: { boxShadow: '0 0 40px rgba(0,245,196,0.5)', transform: 'translateY(-2px)' } })}>← Back to Marketplace</Link>
-        </div>
-      </main>
-    );
-  }
-
-  const [selectedTierIdx, setSelectedTierIdx] = useState(0);
-  const tierData = event.tiers[selectedTierIdx];
-  const [activeTab, setActiveTab] = useState<'pre' | 'day' | 'post'>('pre');
+  const handleInvalidTicket = (reason: string) => {
+    console.log('Tiket tidak valid:', reason);
+  };
 
   return (
-    <main
-      className={css({
-        minHeight: '100vh',
-        bg: 'bg',
-        color: 'text',
-        position: 'relative',
-        overflow: 'hidden',
-        pt: '100px',
-        pb: '120px',
-      })}
-      style={{
-        backgroundImage:
-          'linear-gradient(rgba(34,211,238,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.05) 1px, transparent 1px)',
-        backgroundSize: '32px 32px',
-      }}
-    >
-      {/* Animated background orbs */}
-      <div className={css({ position: 'absolute', inset: '0', overflow: 'hidden', pointerEvents: 'none' })}>
-        <div className={css({ position: 'absolute', top: '-40', right: '-40', width: '80', height: '80', bg: 'cyan.500/10', borderRadius: 'full', filter: 'blur(3xl)', animation: 'pulseBlob 4s infinite' })} />
-        <div className={css({ position: 'absolute', bottom: '-40', left: '-40', width: '80', height: '80', bg: 'emerald.500/10', borderRadius: 'full', filter: 'blur(3xl)', animation: 'pulseBlob 5s infinite 1s' })} />
-        <div className={css({ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '96', height: '96', bg: 'amber.500/5', borderRadius: 'full', filter: 'blur(3xl)', animation: 'pulseBlob 6s infinite 2s' })} />
-      </div>
-
-      <div className={css({ position: 'relative', zIndex: '10', maxWidth: '4xl', mx: 'auto', px: '4', py: '24' })}>
-        {/* Header */}
-        <div className={css({ mb: '8', textAlign: 'center' })}>
+    <div className={css({ p: '4', maxW: 'container.md', mx: 'auto' })}>
+      {/* Event Header */}
+      <div className={css({
+        background: 'surface',
+        borderRadius: 'xl',
+        p: '6',
+        mb: '6',
+        border: '1px solid',
+        borderColor: 'border',
+      })}>
+        <h1 className={css({ color: 'text', fontSize: '2xl', mb: '2' })}>
+          {event.title}
+        </h1>
+        <p className={css({ color: 'muted', mb: '4' })}>
+          {event.description}
+        </p>
+        
+        {/* Pre-Event Countdown */}
+        {!eventDayStatus.isEventDay && !eventDayStatus.isPostEvent && (
           <div className={css({
-            display: 'inline-block',
-            px: '3',
-            py: '1',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: 'border',
+            display: 'flex',
+            gap: '4',
+            flexWrap: 'wrap',
+            p: '3',
+            bg: 'card',
             borderRadius: 'md',
-            fontFamily: 'mono',
-            fontSize: '11px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.3em',
-            color: 'neon',
+          ))}>
+            <div className={css({ textAlign: 'center' })}>
+              <p className={css({ color: 'text' })}>Hari</p>
+              <p className={css({ fontSize: 'xl', color: 'neon' })}>{timeRemaining.days}</p>
+            </div>
+            <div className={css({ textAlign: 'center' })}>
+              <p className={css({ color: 'text' })}>Jam</p>
+              <p className={css({ fontSize: 'xl', color: 'neon' })}>{timeRemaining.hours}</p>
+            </div>
+            <div className={css({ textAlign: 'center' })}>
+              <p className={css({ color: 'text' })}>Menit</p>
+              <p className={css({ fontSize: 'xl', color: 'neon' })}>{timeRemaining.minutes}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Event Day Status */}
+        {eventDayStatus.isEventDay && (
+          <div className={css({
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2',
+            p: '3',
+            bg: 'emerald',
+            borderRadius: 'md',
+            color: 'white',
             mb: '4',
-          })} >
-            {`Event #${event.id} • NFT Ticketing`}
+          ))}>
+            <div className={css({
+              w: '2',
+              h: '2',
+              borderRadius: 'full',
+              bg: 'white',
+              animation: 'pulseBlob 1s infinite',
+            })}></div>
+            <span>Acara sedang berlangsung - Siapkan QR Code tiket Anda</span>
           </div>
-          <h1 className={css({
-            fontSize: { base: '3xl', md: '4xl', lg: '5xl' },
-            fontWeight: '800',
-            textTransform: 'uppercase',
+        )}
+
+        {/* Post-Event Status */}
+        {eventDayStatus.isPostEvent && (
+          <div className={css({
+            p: '3',
+            bg: 'muted',
+            borderRadius: 'md',
             color: 'text',
-            letterSpacing: '-0.03em',
-            lineHeight: '0.95',
-          })}>
-            {event.title}
-          </h1>
-          <p className={css({ mt: '3', fontSize: 'sm', color: 'muted', fontFamily: 'mono' })}>
-            {event.location} • <span className={css({ color: 'emerald' })}>{event.date}</span>
-          </p>
-          <p className={css({ mt: '2', fontSize: 'sm', color: 'muted', fontFamily: 'mono' })}>{event.description}</p>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className={css({
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '3',
-          mb: '8',
-          p: '2',
-          bg: 'card/80',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: 'border',
-          borderRadius: 'xl',
-          backdropFilter: 'blur(20px)',
-        })} >
-          {[
-            { key: 'pre', label: '01 // PRE-EVENT' },
-            { key: 'day', label: '02 // EVENT DAY' },
-            { key: 'post', label: '03 // POST-EVENT' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as 'pre' | 'day' | 'post')}
-              className={css({
-                flex: '1',
-                px: '4',
-                py: '2.5',
-                borderRadius: 'lg',
-                fontFamily: 'mono',
-                fontSize: '11px',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                transition: 'all 200ms',
-                cursor: 'pointer',
-                bg: activeTab === tab.key ? 'neon' : 'card/60',
-                color: activeTab === tab.key ? 'bg' : 'text',
-                boxShadow: activeTab === tab.key ? '0 0 30px rgba(0,245,196,0.4)' : 'none',
-                _hover: { bg: activeTab === tab.key ? 'neon' : 'rgba(0,245,196,0.1)', color: activeTab === tab.key ? 'bg' : 'neon', boxShadow: activeTab === tab.key ? '0 0 40px rgba(0,245,196,0.5)' : '0 0 20px rgba(0,245,196,0.2)' },
-              })}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Pre-Event tier selection */}
-        {activeTab === 'pre' && (
-          <div className={css({ bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: '2xl', p: '6', backdropFilter: 'blur(20px)' })}>
-            <h2 className={css({ fontSize: 'xl', fontWeight: '800', textTransform: 'uppercase', color: 'text', mb: '1', letterSpacing: '-0.02em' })}>Select Your Tier</h2>
-            <p className={css({ fontSize: '11px', color: 'muted', fontFamily: 'mono', mb: '6', letterSpacing: '0.05em' })}>{'// Pilih tier & selesaikan transaksi untuk membuka Event Day Gate Pass'}</p>
-            <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', md: 'repeat(3, 1fr)' }, gap: '4', mb: '6' })} >
-              {event.tiers.map((tier, idx) => (
-                <button
-                  key={tier.id}
-                  onClick={() => setSelectedTierIdx(idx)}
-                  className={css({
-                    position: 'relative',
-                    p: '4',
-                    borderRadius: 'xl',
-                    textAlign: 'left',
-                    transition: 'all 300ms',
-                    bg: 'card/60',
-                    backdropFilter: 'blur(20px)',
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    borderColor: selectedTierIdx === idx ? tier.border : 'border',
-                    boxShadow: selectedTierIdx === idx ? tier.glow : 'none',
-                    transform: selectedTierIdx === idx ? 'scale(1.02)' : 'scale(1)',
-                    _hover: { borderColor: 'cyan.500/60', transform: 'scale(1.02)' },
-                  })}
-                >
-                  {/* Accent bar */}
-                  <div className={css({ position: 'absolute', left: '0', top: '0', bottom: '0', width: '1', bg: 'gradient-to-b from-cyan.500 via-emerald.500 to-amber.500' })} />
-                  <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2' })} >
-                    <span className={css({ fontFamily: 'mono', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', px: '2', py: '0.5', borderWidth: '1px', borderStyle: 'solid', borderColor: tier.border, color: tier.badgeText, bg: tier.badgeBg, borderRadius: 'md' })} >
-                      {`${tier.name} PASS`}
-                    </span>
-                    <span className={css({ fontFamily: 'mono', fontSize: '11px', color: 'emerald', textTransform: 'uppercase', letterSpacing: '0.05em' })} >
-                      {tier.network}
-                    </span>
-                  </div>
-                  <div className={css({ fontSize: '2xl', fontWeight: '800', fontFamily: 'mono', color: 'text' })}>{tier.price}</div>
-                  <div className={css({ mt: '1', fontSize: 'sm', color: 'muted', fontFamily: 'mono' })}>{`≈ Rp ${tier.fiat}`}</div>
-                </button>
-              ))}
-            </div>
-            <button className={css({ width: 'full', py: '3.5', px: '6', bg: 'neon', color: 'bg', fontFamily: 'mono', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: 'lg', cursor: 'pointer', border: 'none', transition: 'box-shadow 0.2s, transform 0.15s', _hover: { boxShadow: '0 0 40px rgba(0,245,196,0.5)', transform: 'translateY(-2px)' } })}>{'> MINT TIKET SEKARANG'}</button>
-            <div className={css({ mt: '4', p: '3', bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: 'lg', fontFamily: 'mono', fontSize: '11px', color: 'muted' })} >
-              <span className={css({ color: 'neon' })}>// STATUS:</span> Wallet belum terhubung. Klik <span className={css({ color: 'neon' })}>"Connect Wallet"</span> di header untuk mulai mint.
-            </div>
+            mb: '4',
+          ))}>
+            Acara telah berakhir. Terima kasih sudah hadir!
           </div>
         )}
-
-        {/* Day */}
-        {activeTab === 'day' && (
-          <EventDayTicket
-            tokenId={tierData.id}
-            contractAddress="0xbdb5f9745Db186C25424fA0EC5b81009980B87c2"
-            ownerAddress="0x8fc179213fb33f2bf61c8abae3d2a469e9f167b9"
-            tier={tierData.name}
-            tierData={tierData}
-            perks={tierData.benefits}
-            status="UNUSED"
-          />
-        )}
-
-        {/* Post-Event placeholder */}
-        {activeTab === 'post' && (
-          <div className={css({ bg: 'card/60', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', borderRadius: '2xl', p: '8', textAlign: 'center', backdropFilter: 'blur(20px)' })} >
-            <h3 className={css({ fontSize: '2xl', fontWeight: '800', textTransform: 'uppercase', color: 'text', letterSpacing: '-0.02em' })}>Post Event Details</h3>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className={css({ mt: '10', textAlign: 'center' })} >
-          <Link href="/marketplace" className={css({ display: 'inline-block', fontFamily: 'mono', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'text', transition: 'all 200ms', borderWidth: '1px', borderStyle: 'solid', borderColor: 'border', px: '4', py: '2', borderRadius: 'md', textDecoration: 'none', _hover: { borderColor: 'neon', color: 'neon' } })} >
-            {'< KEMBALI KE MARKETPLACE'}
-          </Link>
-        </div>
       </div>
-    </main>
+
+      {/* Ticket Tiers */}
+      <div className={css({
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '4',
+        mb: '6',
+      })}>
+        {[1, 2, 3].map(tierId => (
+          <TierCard 
+            key={tierId}
+            tierId={tierId}
+            label={tierLabel(tierId)}
+            price={tierPriceETH(tierId)}
+            maxSupply={event.tierPricing[tierId as 1 | 2 | 3].supply}
+            sold={event.tierPricing[tierId as 1 | 2 | 3].sold}
+            isActiveMinting={event.isActive}
+          />
+        ))}
+      </div>
+
+      {/* Event Day QR Scanner */}
+      {eventDayStatus.isEventDay && (
+        <EventDayTicket
+          eventId={event.id}
+          expectedTokenId={1}
+          onValid={handleValidTicket}
+          onInvalid={handleInvalidTicket}
+        />
+      )}
+    </div>
+  );
+}
+
+// Tier Card Component
+function TierCard({ 
+  tierId, 
+  label, 
+  price, 
+  maxSupply, 
+  sold,
+  isActiveMinting,
+}: { 
+  tierId: number;
+  label: string;
+  price: string;
+  maxSupply: number;
+  sold: number;
+  isActiveMinting: boolean;
+}) {
+  return (
+    <div className={css({
+      p: '4',
+      bg: 'surface',
+      borderRadius: 'xl',
+      border: '1px solid',
+      borderColor: 'border',
+    })}>
+      <div className={css({
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: '2',
+      ))}>
+        <h3 className={css({ color: 'text', fontSize: 'lg' })}>{label}</h3>
+        <span className={css({
+          px: '2',
+          py: '1',
+          borderRadius: 'md',
+          font size: 'sm',
+          fontWeight: 'bold',
+          color: 'white',
+          bg: tierId === 1 ? 'emerald' : tierId === 2 ? 'cyan' : 'purple',
+        }))}>₺{price}</h3>
+      </div>
+      <p className={css({ color: 'muted', mb: '3' })}>
+        Tersisa: {maxSupply - sold} / {maxSupply}
+      </p>
+      <button 
+        disabled={!isActiveMinting || sold >= maxSupply}
+        className={css({
+          w: 'full',
+          py: '2',
+          borderRadius: 'md',
+          bg: sold >= maxSupply ? 'muted' : 'neon',
+          color: 'black',
+          fontWeight: 'bold',
+          cursor: sold >= maxSupply ? 'not-allowed' : 'pointer',
+          '&:hover': {
+            bg: sold >= maxSupply ? 'muted' : 'emerald',
+          },
+        }))}
+      >
+        {sold >= maxSupply ? 'HABIS' : `BUY TIKET`}
+      </button>
+    </div>
   );
 }
