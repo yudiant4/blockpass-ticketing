@@ -2,33 +2,31 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
+  serverExternalPackages: ['@metamask/sdk', 'pino', 'pino-pretty'],
+  webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './src'),
       'styled-system': path.resolve(__dirname, './styled-system'),
     };
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      net: false,
-      tls: false,
-      crypto: false,
-      path: require.resolve('path-browserify'),
-      os: false,
-      stream: false,
-      util: false,
-    };
-    config.externals = {
-      ...config.externals,
-      '@react-native-async-storage/async-storage': 'commonjs @react-native-async-storage/async-storage',
-      '@metamask/sdk': 'commonjs @metamask/sdk',
-      pino: 'commonjs pino',
-      'pino-pretty': 'commonjs pino-pretty',
-    };
+
+    // Client-side: fallback Node core modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        path: false,
+        os: false,
+        stream: false,
+        util: false,
+      };
+    }
+
     return config;
   },
-  // Ignore TypeScript errors in node_modules (for third-party libraries without proper types)
   typescript: {
     ignoreBuildErrors: true,
   },
