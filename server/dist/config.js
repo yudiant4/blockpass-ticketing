@@ -6,3 +6,12 @@ export const config = {
     FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
     ADMIN_WALLET: process.env.ADMIN_WALLET || '',
 };
+// MongoDB connection options with pool limits
+export const mongoOptions = {
+    maxPoolSize: 5,
+    minPoolSize: 1,
+    maxIdleTimeMS: 30000,
+    waitQueueTimeoutMS: 2000,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+};

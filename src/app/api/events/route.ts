@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { publicClient, BLOCKPASS_TICKET_ADDRESS, BLOCKPASS_TICKET_ABI } from '../../lib/blockpass';
 
 // GET /api/events - List all events
 export async function GET(req: NextRequest) {

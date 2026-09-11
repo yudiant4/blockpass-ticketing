@@ -1,4 +1,4 @@
-import { connect } from 'mongoose';
+// Frontend event helpers – no DB connection needed
 
 // ============================================================
 // MONGODB EVENT SCHEMA
@@ -103,3 +103,82 @@ export function tierPriceETH(id: number): string {
     default: return '0.001';
   }
 }
+
+// ============================================================
+// MARKETPLACE MOCK DATA
+// ============================================================
+export interface MarketplaceEvent {
+  id: string;
+  title: string;
+  organizer: string;
+  category: string;
+  status: string;
+  network: string;
+  date: string;
+  location: string;
+  cryptoPrice: string;
+  fiatPrice: string;
+  supply: { minted: number; total: number };
+  rarity: string;
+  statusColor: string;
+  action: string;
+  trending: boolean;
+  bg: string;
+}
+
+export const marketplaceEvents: MarketplaceEvent[] = [
+  {
+    id: '1',
+    title: 'Web3 Dev Connect 2025',
+    organizer: 'DevDAO',
+    category: 'Konferensi',
+    status: 'Live Minting',
+    network: 'Base',
+    date: '2025-01-20',
+    location: 'Hotel Indonesia, Jakarta',
+    cryptoPrice: '0.003 ETH',
+    fiatPrice: '$10.50',
+    supply: { minted: 245, total: 500 },
+    rarity: 'VIP',
+    statusColor: 'neon',
+    action: 'Mint Now',
+    trending: true,
+    bg: 'linear-gradient(135deg, #0d1017 0%, #1a2030 100%)',
+  },
+  {
+    id: '2',
+    title: 'Solana Hackathon Finals',
+    organizer: 'SuperteamID',
+    category: 'Esports',
+    status: 'Upcoming',
+    network: 'Solana',
+    date: '2025-02-15',
+    location: 'Virtual',
+    cryptoPrice: '0.05 SOL',
+    fiatPrice: '$12.00',
+    supply: { minted: 0, total: 1000 },
+    rarity: 'Regular',
+    statusColor: 'cyan',
+    action: 'Register',
+    trending: true,
+    bg: 'linear-gradient(135deg, #0d1017 0%, #1a2030 100%)',
+  },
+  {
+    id: '3',
+    title: 'NFT Art Exhibition',
+    organizer: 'Kolektif Nusantara',
+    category: 'Exhibition',
+    status: 'Sold Out',
+    network: 'Ethereum',
+    date: '2025-01-10',
+    location: 'Galeri Nasional, Jakarta',
+    cryptoPrice: '0.02 ETH',
+    fiatPrice: '$65.00',
+    supply: { minted: 50, total: 50 },
+    rarity: 'VVIP',
+    statusColor: 'red',
+    action: 'Sold Out',
+    trending: false,
+    bg: 'linear-gradient(135deg, #1a0d0d 0%, #301a1a 100%)',
+  },
+];
