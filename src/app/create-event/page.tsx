@@ -270,7 +270,7 @@ export default function CreateEventPage() {
             </label>
 
             {/* Description */}
-            <label className={css({ block, colSpan: 2 })}>
+                        <label className={css({ block, gridColumn: 'span 2' })} >
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Description</span>
               <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 className={css({
