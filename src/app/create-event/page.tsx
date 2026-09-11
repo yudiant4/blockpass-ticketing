@@ -128,7 +128,6 @@ export default function CreateEventPage() {
                 Connect your wallet to create an event.
               </span>
             </div>
-            {/* Placeholder button – you can hook to your wallet modal */}
             <button className={css({
               bg: 'emerald.600',
               hover: { bg: 'emerald.500' },
@@ -164,7 +163,7 @@ export default function CreateEventPage() {
               <span className={css({ fontSize: 'lg', fontWeight: '600' })}>General Information</span>
             </div>
           </div>
-          <div className={css({ grid: 'gap-4 md:grid-cols-2' })}>
+          <div className={css({ gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
             {/* Title */}
             <label className={css({ block })}>
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Title<span className={css({ color: 'emerald.400' })}>*</span></span>
@@ -329,7 +328,7 @@ export default function CreateEventPage() {
                   <button onClick={() => removeTier(i)} className={css({ color: 'red.400', fontSize: 'sm', cursor: 'pointer' })}>Remove</button>
                 )}
               </div>
-              <div className={css({ grid: 'gap-3 md:grid-cols-2' })}>
+              <div className={css({ gap: '3', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
                 <label className={css({ block })}>
                   <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Tier Name<span className={css({ color: 'emerald.400' })}>*</span></span>
                   <input type="text" value={tier.tierName} onChange={e => updateTier(i, 'tierName', e.target.value)}
@@ -441,7 +440,7 @@ export default function CreateEventPage() {
               <span className={css({ fontSize: 'lg', fontWeight: '600' })}>Summary</span>
             </div>
           </div>
-          <div className={css({ grid: 'gap-4 md:grid-cols-3' })}>
+          <div className={css({ gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(3,1fr)' } })}>
             <div className={css({ textAlign: 'center', p: '3', bg: 'gray.800', rounded: 'md' })}>
               <p className={css({ textXs: true, color: 'gray.400' })}>Total Quota</p>
               <p className={css({ fontSize: '2xl', fontWeight: 'bold', color: 'emerald.400' })}>{totalQuota}</p>
