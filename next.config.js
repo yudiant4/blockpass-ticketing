@@ -2,6 +2,12 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [{
+      source: '/api/:path*',
+      destination: 'http://129.226.95.94:3002/api/:path*',
+    }];
+  },
   webpack: (config, { isServer }) => {
     // Aliases
     config.resolve.alias = {
