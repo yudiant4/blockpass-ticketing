@@ -75,7 +75,7 @@ export default function CreateEventPage() {
     setSubmitting(true);
     setMessage('');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/events`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

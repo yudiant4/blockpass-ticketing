@@ -39,7 +39,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/events/${params.id}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/events/${params.id}`)
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success') setEvent(d.data);
