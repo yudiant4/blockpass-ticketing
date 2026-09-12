@@ -165,7 +165,7 @@ export default function CreateEventPage() {
           </div>
           <div className={css({ gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
             {/* Title */}
-            <label className={css({ block })}>
+            <label className={css({ display: 'block' })}>
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Title<span className={css({ color: 'emerald.400' })}>*</span></span>
               <input type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                 className={css({
@@ -182,7 +182,7 @@ export default function CreateEventPage() {
             </label>
 
             {/* Category */}
-            <label className={css({ block })}>
+            <label className={css({ display: 'block' })}>
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Category<span className={css({ color: 'emerald.400' })}>*</span></span>
               <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                 className={css({
@@ -204,7 +204,7 @@ export default function CreateEventPage() {
             </label>
 
             {/* Start / End Date */}
-            <label className={css({ block })}>
+            <label className={css({ display: 'block' })}>
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Start Date<span className={css({ color: 'emerald.400' })}>*</span></span>
               <input type="datetime-local" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
                 className={css({
@@ -219,7 +219,7 @@ export default function CreateEventPage() {
                 })}
               />
             </label>
-            <label className={css({ block })}>
+            <label className={css({ display: 'block' })}>
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>End Date<span className={css({ color: 'emerald.400' })}>*</span></span>
               <input type="datetime-local" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
                 className={css({
@@ -236,7 +236,7 @@ export default function CreateEventPage() {
             </label>
 
             {/* Location */}
-            <label className={css({ block })}>
+            <label className={css({ display: 'block' })}>
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Location<span className={css({ color: 'emerald.400' })}>*</span></span>
               <input type="text" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
                 className={css({
@@ -253,7 +253,7 @@ export default function CreateEventPage() {
             </label>
 
             {/* Banner URL */}
-            <label className={css({ block })}>
+            <label className={css({ display: 'block' })}>
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Banner URL</span>
               <input type="text" value={form.bannerUrl} onChange={e => setForm(f => ({ ...f, bannerUrl: e.target.value }))}
                 className={css({
@@ -270,7 +270,7 @@ export default function CreateEventPage() {
             </label>
 
             {/* Description */}
-                        <label className={css({ block, gridColumn: 'span 2' })} >
+                        <label className={css({ display: 'block', gridColumn: 'span 2' })} >
               <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Description</span>
               <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 className={css({
@@ -329,7 +329,7 @@ export default function CreateEventPage() {
                 )}
               </div>
               <div className={css({ gap: '3', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
-                <label className={css({ block })}>
+                <label className={css({ display: 'block' })}>
                   <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Tier Name<span className={css({ color: 'emerald.400' })}>*</span></span>
                   <input type="text" value={tier.tierName} onChange={e => updateTier(i, 'tierName', e.target.value)}
                     className={css({
@@ -344,7 +344,7 @@ export default function CreateEventPage() {
                     })}
                   />
                 </label>
-                <label className={css({ block })}>
+                <label className={css({ display: 'block' })}>
                   <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Price (ETH)<span className={css({ color: 'emerald.400' })}>*</span></span>
                   <input type="number" step="0.001" min="0" value={tier.price} onChange={e => updateTier(i, 'price', parseFloat(e.target.value) || 0)}
                     className={css({
@@ -359,7 +359,7 @@ export default function CreateEventPage() {
                     })}
                   />
                 </label>
-                <label className={css({ block })}>
+                <label className={css({ display: 'block' })}>
                   <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Quota<span className={css({ color: 'emerald.400' })}>*</span></span>
                   <input type="number" min="1" value={tier.quota} onChange={e => updateTier(i, 'quota', parseInt(e.target.value) || 1)}
                     className={css({
@@ -374,7 +374,7 @@ export default function CreateEventPage() {
                     })}
                   />
                 </label>
-                <label className={css({ block })}>
+                <label className={css({ display: 'block' })}>
                   <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Max per Wallet<span className={css({ color: 'emerald.400' })}>*</span></span>
                   <input type="number" min="1" value={tier.maxPerWallet} onChange={e => updateTier(i, 'maxPerWallet', parseInt(e.target.value) || 1)}
                     className={css({
@@ -389,7 +389,7 @@ export default function CreateEventPage() {
                     })}
                   />
                 </label>
-                <label className={css({ block })}>
+                <label className={css({ display: 'block' })}>
                   <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Perks (comma separated)</span>
                   <input type="text" value={tier.perks.join(', ')} onChange={e => updateTier(i, 'perks', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                     className={css({
@@ -404,7 +404,7 @@ export default function CreateEventPage() {
                     })}
                   />
                 </label>
-                <label className={css({ block })}>
+                <label className={css({ display: 'block' })}>
                   <span className={css({ textXs: true, fontFamily: 'mono', color: 'gray.400' })}>Custom Fields (comma separated)</span>
                   <input type="text" value={tier.customFields.join(', ')} onChange={e => updateTier(i, 'customFields', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                     className={css({
