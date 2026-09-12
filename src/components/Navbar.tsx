@@ -15,6 +15,7 @@ export default function Navbar() {
     // Menu dasar saat belum konek wallet (tanpa Events)
     const baseNavLinks = [
         { name: 'Marketplace', path: '/marketplace' },
+        { name: 'Create Event', path: '/create-event' },
         // { name: 'Events', path: '/event' }, // removed – Marketplace covers events
         { name: 'How It Works', path: '/#how-it-works' },
         { name: 'Docs', path: '/#docs' },
