@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import { css } from 'styled-system/css';
-import { useAccount, ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
 import { FileText, Layers, AlertCircle } from 'lucide-react';
 
 interface Tier {
