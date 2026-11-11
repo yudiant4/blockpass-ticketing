@@ -32,11 +32,13 @@ function toCard(ev: EventLike): MarketplaceEvent {
     fiatPrice: `~$${(price * 3500).toFixed(2)}`,
     supply,
     rarity: topTier?.tierName || 'Regular',
-    statusColor: status === 'Live Minting' ? 'neon' : status === 'Sold Out' ? 'red' : 'cyan',
-    action: status === 'Sold Out' ? 'Sold Out' : status === 'Upcoming' ? 'Register' : 'Mint Now',
-    trending: status === 'Live Minting' || supply.minted > 50,
+    statusColor:
+      status === 'Live Minting' ? 'neon' : status === 'Sold Out' || status === 'Ended' ? 'red' : 'cyan',
+    action:
+      status === 'Sold Out' || status === 'Ended' ? status : status === 'Upcoming' ? 'Register' : 'Mint Now',
+    trending: status === 'Live Minting' || (status !== 'Ended' && supply.minted > 50),
     bg:
-      status === 'Sold Out'
+      status === 'Sold Out' || status === 'Ended'
         ? 'linear-gradient(135deg, #1a0d0d 0%, #301a1a 100%)'
         : 'linear-gradient(135deg, #0d1017 0%, #1a2030 100%)',
   };

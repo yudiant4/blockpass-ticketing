@@ -21,9 +21,9 @@ export type EventLike = {
 };
 
 export function statusLabel(event: EventLike): string {
-  if (event.status === 'Ended' || new Date(event.endDate) < new Date()) return 'Sold Out';
-  const soldOut = event.tiers.every((t) => t.sold >= t.quota);
+  const soldOut = event.tiers.length > 0 && event.tiers.every((t) => t.sold >= t.quota);
   if (soldOut) return 'Sold Out';
+  if (event.status === 'Ended' || new Date(event.endDate) < new Date()) return 'Ended';
   if (event.status === 'Draft') return 'Upcoming';
   if (new Date(event.startDate) > new Date()) return 'Upcoming';
   return 'Live Minting';
