@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { css } from 'styled-system/css';
-import { Ticket, Check } from 'lucide-react';
 import { parseEther } from 'viem';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { Ticket, Check } from 'lucide-react';
 import { BLOCKPASS_TICKET_ABI, BLOCKPASS_TICKET_ADDRESS } from '@/config/contracts';
 import { apiUrl } from '@/lib/api';
+import { LaunchButton, SceneFrame } from './three/ClientScenes';
 
 interface Tier {
   tierId: string;
@@ -69,11 +69,9 @@ export default function TierCard({ tier, eventId, isEnded, walletAddress }: Prop
       setResult('Connect wallet terlebih dahulu');
       return;
     }
-
     setLoading(true);
     setResult('');
     reset();
-
     try {
       const res = await fetch(apiUrl(`/api/events/${eventId}/buy-intent`), {
         method: 'POST',
@@ -86,14 +84,12 @@ export default function TierCard({ tier, eventId, isEnded, walletAddress }: Prop
         setLoading(false);
         return;
       }
-
-      const value = parseEther(String(tier.price));
       writeContract({
         address: BLOCKPASS_TICKET_ADDRESS,
         abi: BLOCKPASS_TICKET_ABI,
         functionName: 'mintTicket',
         args: [BigInt(data.data.onChainTierId || onChainId), BigInt(1)],
-        value,
+        value: parseEther(String(tier.price)),
       });
       setResult('Confirm transaction di wallet…');
     } catch (e: any) {
@@ -103,129 +99,57 @@ export default function TierCard({ tier, eventId, isEnded, walletAddress }: Prop
   };
 
   return (
-    <div
-      className={css({
-        bg: 'rgba(255,255,255,0.02)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        rounded: 'lg',
-        p: '6',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '4',
-        opacity: disabled && !soldOut ? '0.6' : '1',
-      })}
-    >
-      <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center' })}>
-        <h3
-          className={css({
-            fontFamily: 'mono',
-            fontSize: 'lg',
-            fontWeight: '700',
-            color: 'white',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          })}
-        >
+    <div className="bp-glass" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14, opacity: disabled && !soldOut ? 0.65 : 1 }}>
+      <SceneFrame height={88}>
+        <LaunchButton mode="dark" hue={0.45} />
+      </SceneFrame>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h3 className="bp-mono" style={{ fontSize: 16, fontWeight: 700, margin: 0, textTransform: 'uppercase' }}>
           {tier.tierName}
         </h3>
-        <span
-          className={css({
-            fontFamily: 'mono',
-            fontSize: 'sm',
-            fontWeight: '700',
-            px: '3',
-            py: '1',
-            rounded: 'md',
-            bg: soldOut ? 'gray.700' : 'neon',
-            color: soldOut ? 'gray.400' : 'black',
-          })}
-        >
+        <span className="bp-mono" style={{ background: soldOut ? '#333' : 'var(--bp-neon)', color: soldOut ? '#999' : '#04110d', padding: '4px 10px', borderRadius: 8, fontWeight: 700, fontSize: 12 }}>
           {tier.price} ETH
         </span>
       </div>
 
       <div>
-        <div className={css({ display: 'flex', justifyContent: 'space-between', mb: '1' })}>
-          <span className={css({ fontFamily: 'mono', fontSize: 'xs', color: 'gray.400', textTransform: 'uppercase' })}>
-            QUOTA
-          </span>
-          <span className={css({ fontFamily: 'mono', fontSize: 'xs', color: 'gray.300' })}>
+        <div className="bp-mono" style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--bp-muted)', marginBottom: 6 }}>
+          <span>QUOTA</span>
+          <span>
             {remaining} / {tier.quota} remaining
           </span>
         </div>
-        <div className={css({ w: 'full', h: '2', bg: 'gray.800', rounded: 'full' })}>
-          <div
-            className={css({
-              h: 'full',
-              rounded: 'full',
-              bg: soldOut ? 'gray.600' : 'neon',
-              transition: 'width 0.3s',
-            })}
-            style={{ width: `${Math.min(pct, 100)}%` }}
-          />
+        <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 999, overflow: 'hidden' }}>
+          <div style={{ width: `${Math.min(pct, 100)}%`, height: '100%', background: soldOut ? '#555' : 'var(--bp-neon)' }} />
         </div>
       </div>
 
-      {tier.perks && tier.perks.length > 0 && (
-        <div className={css({ display: 'flex', flexDirection: 'column', gap: '1' })}>
+      {tier.perks?.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {tier.perks.map((perk, i) => (
-            <div key={i} className={css({ display: 'flex', alignItems: 'center', gap: '2' })}>
-              <Check size={12} className={css({ color: 'neon' })} />
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', color: 'gray.300' })}>{perk}</span>
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Check size={12} color="var(--bp-neon)" />
+              <span className="bp-mono" style={{ fontSize: 11, color: 'var(--bp-muted)' }}>
+                {perk}
+              </span>
             </div>
           ))}
         </div>
       )}
 
-      <button
-        onClick={handleBuy}
-        disabled={disabled}
-        className={css({
-          w: 'full',
-          py: '3',
-          rounded: 'md',
-          bg: disabled ? 'gray.700' : 'neon',
-          color: disabled ? 'gray.500' : 'black',
-          fontWeight: 'bold',
-          fontFamily: 'mono',
-          fontSize: 'sm',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '2',
-          transition: 'background 0.2s',
-        })}
-      >
+      <button className={`bp-btn ${disabled ? '' : 'bp-btn-solid'}`} disabled={disabled} onClick={handleBuy} style={{ width: '100%' }}>
         <Ticket size={16} />
-        {isEnded
-          ? 'EVENT ENDED'
-          : soldOut
-            ? 'SOLD OUT'
-            : loading || confirming
-              ? confirming
-                ? 'CONFIRMING…'
-                : 'MINTING…'
-              : 'BUY TICKET'}
+        {isEnded ? 'EVENT ENDED' : soldOut ? 'SOLD OUT' : loading || confirming ? (confirming ? 'CONFIRMING…' : 'MINTING…') : 'BUY TICKET'}
       </button>
 
       {result && (
-        <p
-          className={css({
-            fontFamily: 'mono',
-            fontSize: 'xs',
-            textAlign: 'center',
-            color: result.toLowerCase().includes('mint') || result.includes('Confirm') ? 'neon' : 'red.400',
-          })}
-        >
+        <p className="bp-mono" style={{ fontSize: 11, textAlign: 'center', color: result.toLowerCase().includes('mint') || result.includes('Confirm') ? 'var(--bp-neon)' : 'var(--bp-neon3)', margin: 0 }}>
           {result}
         </p>
       )}
 
-      <p className={css({ fontFamily: 'mono', fontSize: 'xs', color: 'gray.600', textAlign: 'center' })}>
+      <p className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)', textAlign: 'center', margin: 0 }}>
         MAX {tier.maxPerWallet} PER WALLET · ON-CHAIN ID {onChainId}
       </p>
     </div>

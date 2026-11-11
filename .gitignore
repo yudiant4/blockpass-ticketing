@@ -33,3 +33,6 @@ docs/
 
 # Local file-backed event store
 data/
+
+# Copied from @designcodeio/threeui on install/build
+public/landing-pages/

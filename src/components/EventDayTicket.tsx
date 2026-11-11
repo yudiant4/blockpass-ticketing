@@ -1,12 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { css } from 'styled-system/css';
+
+import { useEffect, useState } from 'react';
 import { verifyTicket } from '@/lib/blockpass';
 
 interface QRCodeScannerProps {
   eventId: string;
   expectedTokenId: number;
-  /** ISO date when scanning window ends (defaults to far future for demos) */
   endsAt?: string;
   onValid: (wallet: string) => void;
   onInvalid: (reason: string) => void;
@@ -31,7 +30,7 @@ export default function QRCodeScanner({
       setMinutesLeft(m);
       if (diff <= 0) {
         setScanning(false);
-        setMessage('Acara telah berakhir');
+        setMessage('Event has ended');
       }
     }, 1000);
     return () => clearInterval(iv);
@@ -41,18 +40,18 @@ export default function QRCodeScanner({
     try {
       const data = JSON.parse(decoded);
       if (data.eventId !== eventId) {
-        onInvalid('ID acara tidak sesuai');
+        onInvalid('Event ID mismatch');
         return;
       }
       if (parseInt(data.tokenId, 10) !== expectedTokenId) {
-        onInvalid('Token ID tidak valid');
+        onInvalid('Token ID invalid');
         return;
       }
       verifyTicket(expectedTokenId, data.wallet as `0x${string}`).then((ok) => {
-        ok ? onValid(data.wallet) : onInvalid('Tiket tidak ditemukan on-chain');
+        ok ? onValid(data.wallet) : onInvalid('Ticket not found on-chain');
       });
     } catch {
-      onInvalid('QR Code tidak valid');
+      onInvalid('Invalid QR code');
     }
   };
 
@@ -68,45 +67,28 @@ export default function QRCodeScanner({
 
   if (!scanning && minutesLeft !== null && minutesLeft <= 0) {
     return (
-      <div className={css({ p: '4', bg: 'surface', border: '1px solid token(colors.border)', borderRadius: 'md' })}>
-        <p className={css({ color: 'muted', fontFamily: 'mono' })}>Scanning window closed — event ended.</p>
+      <div style={{ padding: 16 }}>
+        <p className="bp-mono" style={{ color: 'var(--bp-muted)' }}>
+          Scanning window closed — event ended.
+        </p>
       </div>
     );
   }
 
   return (
-    <div
-      className={css({
-        p: '4',
-        background: 'surface',
-        borderRadius: 'md',
-        border: '1px solid',
-        borderColor: 'border',
-      })}
-    >
-      <h3 className={css({ color: 'text', mb: '4', fontFamily: 'mono' })}>Ticket Verification</h3>
-      <p className={css({ color: 'muted', mb: '4', fontFamily: 'mono', fontSize: '13px' })}>
+    <div style={{ padding: 18 }}>
+      <h3 className="bp-mono" style={{ margin: '0 0 10px' }}>
+        Ticket Verification
+      </h3>
+      <p className="bp-mono" style={{ color: 'var(--bp-muted)', fontSize: 13, marginBottom: 12 }}>
         {message}
       </p>
       {minutesLeft !== null && (
-        <p className={css({ color: 'neon', mb: '4', fontFamily: 'mono', fontSize: '11px' })}>
+        <p className="bp-mono" style={{ color: 'var(--bp-neon)', fontSize: 11, marginBottom: 14 }}>
           Window closes in ~{Math.max(0, minutesLeft)} min
         </p>
       )}
-      <button
-        onClick={mockScan}
-        className={css({
-          bg: 'neon',
-          color: 'black',
-          px: '4',
-          py: '2',
-          borderRadius: 'md',
-          cursor: 'pointer',
-          fontFamily: 'mono',
-          fontSize: '12px',
-          fontWeight: '700',
-        })}
-      >
+      <button className="bp-btn bp-btn-solid" onClick={mockScan}>
         Mock Scan
       </button>
     </div>

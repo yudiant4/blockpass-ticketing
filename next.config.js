@@ -2,9 +2,8 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['@designcodeio/threeui', 'three'],
   async rewrites() {
-    // Optional proxy to external Express/Mongo backend.
-    // When unset, Next.js /api/* routes (file-backed event store) are used.
     const backend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL;
     if (!backend) return [];
     const destination = backend.replace(/\/$/, '');

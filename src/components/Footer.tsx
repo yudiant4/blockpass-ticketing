@@ -1,50 +1,40 @@
-import { css } from '../../styled-system/css';
+'use client';
+
+import { NewsletterFooter } from './three/ClientScenes';
 
 export default function Footer() {
-    return (
-        <footer
-            className={css({
-                background: 'surface',
-                color: 'text',
-                padding: '48px 40px 32px',
-                borderTop: '1px solid token(colors.border)',
-                position: 'relative',
-                zIndex: 1,
-            })}
+  return (
+    <footer style={{ position: 'relative', zIndex: 2, padding: '40px 24px 28px' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <div className="bp-glass" style={{ overflow: 'hidden', marginBottom: 18 }}>
+          <NewsletterFooter style={{ width: '100%', minHeight: 220 }} />
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+            padding: '8px 4px',
+          }}
         >
-            <div
-                className={css({
-                    maxWidth: '1200px',
-                    margin: '0 auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '16px',
-                })}
-            >
-                <div className={css({ fontSize: '13px', color: 'muted', fontFamily: 'mono' })}>
-                    © 2026 Blockpass. All rights reserved.
-                </div>
-                <div className={css({ display: 'flex', gap: '24px' })}>
-                    {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (
-                        <a
-                            key={link}
-                            href="#"
-                            className={css({
-                                fontSize: '13px',
-                                color: 'muted',
-                                textDecoration: 'none',
-                                fontFamily: 'mono',
-                                transition: 'color 0.2s',
-                                _hover: { color: 'neon' },
-                            })}
-                        >
-                            {link}
-                        </a>
-                    ))}
-                </div>
-            </div>
-        </footer>
-    );
+          <div className="bp-mono" style={{ fontSize: 12, color: 'var(--bp-muted)' }}>
+            © 2026 Blockpass · UI by ThreeUI Community
+          </div>
+          <div style={{ display: 'flex', gap: 20 }}>
+            {['Privacy', 'Terms', 'Cookies'].map((link) => (
+              <a
+                key={link}
+                href="#"
+                className="bp-mono"
+                style={{ fontSize: 12, color: 'var(--bp-muted)', textDecoration: 'none' }}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 }

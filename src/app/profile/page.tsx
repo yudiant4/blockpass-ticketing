@@ -2,25 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { css } from '../../../styled-system/css';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { apiUrl } from '@/lib/api';
 import { TIER_NAMES, TIER_PRICES } from '@/config/contracts';
+import { DiagnosticsFrame, PerformanceFrame } from '@/components/three/ProfileScenes';
 
-type OwnedBalance = {
-  tierId: number;
-  name: string;
-  balance: number;
-};
-
-const tierBg: Record<number, string> = {
-  1: 'linear-gradient(135deg, #0a2010 0%, #0f3d2e 100%)',
-  2: 'linear-gradient(135deg, #0d1f2d 0%, #1a2030 100%)',
-  3: 'linear-gradient(135deg, #1a0d2d 0%, #2d1a30 100%)',
-};
+type OwnedBalance = { tierId: number; name: string; balance: number };
 
 export default function ProfilePage() {
   const { address, isConnected } = useAccount();
@@ -60,280 +50,126 @@ export default function ProfilePage() {
     const price = Number(TIER_PRICES[b.tierId as keyof typeof TIER_PRICES] || 0);
     return s + price * b.balance;
   }, 0);
-
   const short = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : '—';
 
   return (
-    <main className={css({ minHeight: '100vh', paddingTop: '100px', paddingBottom: '40px' })}>
-      <Navbar />
-      <div className={css({ maxWidth: '1200px', margin: '0 auto', padding: '0 40px' })}>
-        <div
-          className={css({
-            background: 'surface',
-            border: '1px solid token(colors.border)',
-            padding: '40px',
-            marginBottom: '40px',
-            display: 'flex',
-            flexDirection: { base: 'column', md: 'row' },
-            alignItems: { base: 'flex-start', md: 'center' },
-            justifyContent: 'space-between',
-            gap: '24px',
-          })}
-        >
-          <div className={css({ display: 'flex', alignItems: 'center', gap: '24px' })}>
-            <div
-              className={css({
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, token(colors.neon), token(colors.neon2))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: 'mono',
-                fontSize: '24px',
-                fontWeight: '800',
-                color: 'bg',
-              })}
-            >
-              0x
-            </div>
-            <div>
-              <div
-                className={css({
-                  fontFamily: 'mono',
-                  fontSize: '11px',
-                  color: 'neon',
-                  letterSpacing: '0.2em',
-                  marginBottom: '8px',
-                })}
-              >
-                {isConnected ? 'CONNECTED WALLET' : 'WALLET NOT CONNECTED'}
+    <main className="bp-page">
+      <div className="bp-bg-layer" aria-hidden>
+        <DiagnosticsFrame />
+      </div>
+      <div className="bp-content">
+        <Navbar />
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '110px 24px 40px' }}>
+          <div className="bp-glass" style={{ padding: 28, marginBottom: 28, display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+              <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, var(--bp-neon), var(--bp-neon2))', display: 'grid', placeItems: 'center', fontFamily: 'Space Mono, monospace', fontWeight: 800, color: '#04110d' }}>
+                0x
               </div>
-              <h1 className={css({ fontSize: '28px', fontWeight: '800', fontFamily: 'mono' })}>{short}</h1>
-            </div>
-          </div>
-
-          <div className={css({ display: 'flex', gap: '32px', alignItems: 'center', flexWrap: 'wrap' })}>
-            <div>
-              <div
-                className={css({
-                  fontFamily: 'mono',
-                  fontSize: '11px',
-                  color: 'muted',
-                  textTransform: 'uppercase',
-                  marginBottom: '4px',
-                })}
-              >
-                Total Tickets
-              </div>
-              <div className={css({ fontSize: '24px', fontWeight: '800', color: 'text' })}>{totalTickets}</div>
-            </div>
-            <div>
-              <div
-                className={css({
-                  fontFamily: 'mono',
-                  fontSize: '11px',
-                  color: 'muted',
-                  textTransform: 'uppercase',
-                  marginBottom: '4px',
-                })}
-              >
-                Est. Value
-              </div>
-              <div className={css({ fontSize: '24px', fontWeight: '800', color: 'neon' })}>
-                {estValue.toFixed(3)} ETH
-              </div>
-            </div>
-            <ConnectButton />
-          </div>
-        </div>
-
-        <div
-          className={css({
-            display: 'flex',
-            gap: '32px',
-            borderBottom: '1px solid token(colors.border)',
-            marginBottom: '40px',
-          })}
-        >
-          {['Collected Tickets', 'Past Events (POAP)', 'Listed For Sale'].map((label, idx) => (
-            <button
-              key={label}
-              onClick={() => setTab(idx)}
-              className={css({
-                background: 'transparent',
-                border: 'none',
-                padding: '0 0 16px 0',
-                fontFamily: 'mono',
-                fontSize: '13px',
-                textTransform: 'uppercase',
-                color: tab === idx ? 'neon' : 'muted',
-                borderBottom: tab === idx ? '2px solid token(colors.neon)' : '2px solid transparent',
-                cursor: 'pointer',
-                _hover: { color: 'neon' },
-              })}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {!isConnected && (
-          <div className={css({ textAlign: 'center', padding: '60px 20px', fontFamily: 'mono', color: 'muted' })}>
-            Connect wallet to view your on-chain tickets.
-          </div>
-        )}
-
-        {isConnected && loading && (
-          <div className={css({ textAlign: 'center', padding: '40px', fontFamily: 'mono', color: 'neon' })}>
-            LOADING TICKETS…
-          </div>
-        )}
-
-        {isConnected && error && (
-          <div className={css({ textAlign: 'center', padding: '40px', fontFamily: 'mono', color: 'red' })}>{error}</div>
-        )}
-
-        {isConnected && !loading && tab === 0 && balances.length === 0 && (
-          <div className={css({ textAlign: 'center', padding: '60px 20px' })}>
-            <p className={css({ fontFamily: 'mono', color: 'muted', marginBottom: '24px' })}>
-              Belum ada tiket di wallet ini.
-            </p>
-            <Link href="/marketplace" className={css({ textDecoration: 'none' })}>
-              <span
-                className={css({
-                  display: 'inline-block',
-                  padding: '12px 24px',
-                  background: 'neon',
-                  color: 'bg',
-                  fontFamily: 'mono',
-                  fontSize: '12px',
-                  fontWeight: '800',
-                  textTransform: 'uppercase',
-                })}
-              >
-                Explore Marketplace
-              </span>
-            </Link>
-          </div>
-        )}
-
-        {isConnected && !loading && tab === 0 && (
-          <div
-            className={css({
-              display: 'grid',
-              gridTemplateColumns: { base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-              gap: '24px',
-            })}
-          >
-            {balances.map((ticket) => (
-              <div
-                key={ticket.tierId}
-                className={css({
-                  background: 'card',
-                  border: '1px solid token(colors.border)',
-                  transition: 'transform 0.3s, border-color 0.3s',
-                  _hover: { transform: 'translateY(-4px)', borderColor: 'neon' },
-                })}
-              >
-                <div
-                  className={css({ height: '160px', padding: '20px', position: 'relative' })}
-                  style={{ background: tierBg[ticket.tierId] || tierBg[1] }}
-                >
-                  <span
-                    className={css({
-                      position: 'absolute',
-                      top: '20px',
-                      right: '20px',
-                      padding: '4px 8px',
-                      background: 'rgba(0,0,0,0.8)',
-                      border: '1px solid token(colors.neon)',
-                      color: 'neon',
-                      fontFamily: 'mono',
-                      fontSize: '9px',
-                      textTransform: 'uppercase',
-                    })}
-                  >
-                    Active
-                  </span>
-                  <div
-                    className={css({
-                      position: 'absolute',
-                      bottom: '20px',
-                      left: '20px',
-                      fontFamily: 'mono',
-                      fontSize: '14px',
-                      fontWeight: '800',
-                      color: 'white',
-                    })}
-                  >
-                    TIER #{ticket.tierId} × {ticket.balance}
-                  </div>
+              <div>
+                <div className="bp-mono" style={{ color: 'var(--bp-neon)', fontSize: 11, letterSpacing: '0.18em', marginBottom: 6 }}>
+                  {isConnected ? 'CONNECTED WALLET' : 'WALLET NOT CONNECTED'}
                 </div>
-
-                <div className={css({ padding: '24px' })}>
-                  <div
-                    className={css({
-                      fontFamily: 'mono',
-                      fontSize: '10px',
-                      color: 'muted',
-                      letterSpacing: '0.1em',
-                      marginBottom: '8px',
-                    })}
-                  >
-                    {TIER_NAMES[ticket.tierId as keyof typeof TIER_NAMES] || ticket.name}
-                  </div>
-                  <h3 className={css({ fontSize: '18px', fontWeight: '700', marginBottom: '16px' })}>
-                    Blockpass Ticket
-                  </h3>
-                  <div
-                    className={css({
-                      fontFamily: 'mono',
-                      fontSize: '11px',
-                      color: 'muted',
-                      marginBottom: '24px',
-                    })}
-                  >
-                    {TIER_PRICES[ticket.tierId as keyof typeof TIER_PRICES] || '—'} ETH each
-                  </div>
-                  <Link
-                    href={`/event/evt-web3-dev-connect`}
-                    className={css({
-                      display: 'block',
-                      textAlign: 'center',
-                      width: '100%',
-                      padding: '12px',
-                      background: 'transparent',
-                      color: 'neon',
-                      border: '1px solid token(colors.neon)',
-                      fontFamily: 'mono',
-                      fontSize: '11px',
-                      textTransform: 'uppercase',
-                      textDecoration: 'none',
-                      _hover: { background: 'rgba(0,245,196,0.1)' },
-                    })}
-                  >
-                    View Event
-                  </Link>
-                </div>
+                <h1 className="bp-mono" style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>
+                  {short}
+                </h1>
               </div>
+            </div>
+            <div style={{ display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div>
+                <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)' }}>
+                  TOTAL TICKETS
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 800 }}>{totalTickets}</div>
+              </div>
+              <div>
+                <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)' }}>
+                  EST. VALUE
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--bp-neon)' }}>{estValue.toFixed(3)} ETH</div>
+              </div>
+              <ConnectButton />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 28, borderBottom: '1px solid var(--bp-border)', marginBottom: 28 }}>
+            {['Collected Tickets', 'Past Events (POAP)', 'Listed For Sale'].map((label, idx) => (
+              <button
+                key={label}
+                onClick={() => setTab(idx)}
+                className="bp-mono"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '0 0 14px',
+                  fontSize: 12,
+                  textTransform: 'uppercase',
+                  color: tab === idx ? 'var(--bp-neon)' : 'var(--bp-muted)',
+                  borderBottom: tab === idx ? '2px solid var(--bp-neon)' : '2px solid transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                {label}
+              </button>
             ))}
           </div>
-        )}
 
-        {tab === 1 && (
-          <div className={css({ textAlign: 'center', padding: '60px', fontFamily: 'mono', color: 'muted' })}>
-            POAP history coming soon — gunakan tiket yang sudah di-scan di event day.
-          </div>
-        )}
-        {tab === 2 && (
-          <div className={css({ textAlign: 'center', padding: '60px', fontFamily: 'mono', color: 'muted' })}>
-            Secondary listings belum aktif. Transfer NFT via wallet explorer untuk saat ini.
-          </div>
-        )}
+          {!isConnected && (
+            <div className="bp-glass" style={{ padding: 40, textAlign: 'center' }}>
+              <PerformanceFrame />
+              <p className="bp-mono" style={{ color: 'var(--bp-muted)', marginTop: 18 }}>
+                Connect wallet to view your on-chain tickets.
+              </p>
+            </div>
+          )}
+
+          {isConnected && loading && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-neon)' }}>LOADING TICKETS…</p>}
+          {isConnected && error && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-neon3)' }}>{error}</p>}
+
+          {isConnected && !loading && tab === 0 && balances.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 48 }}>
+              <p className="bp-mono" style={{ color: 'var(--bp-muted)', marginBottom: 18 }}>
+                No tickets in this wallet yet.
+              </p>
+              <Link href="/marketplace" className="bp-btn bp-btn-solid">
+                Explore Marketplace
+              </Link>
+            </div>
+          )}
+
+          {isConnected && !loading && tab === 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
+              {balances.map((ticket) => (
+                <div key={ticket.tierId} className="bp-glass" style={{ overflow: 'hidden' }}>
+                  <div style={{ height: 140, padding: 18, position: 'relative', background: 'linear-gradient(135deg,#0a2010,#0f3d2e)' }}>
+                    <span className="bp-mono" style={{ position: 'absolute', top: 18, right: 18, border: '1px solid var(--bp-neon)', color: 'var(--bp-neon)', fontSize: 9, padding: '4px 8px' }}>
+                      Active
+                    </span>
+                    <div className="bp-mono" style={{ position: 'absolute', bottom: 18, left: 18, fontWeight: 800 }}>
+                      TIER #{ticket.tierId} × {ticket.balance}
+                    </div>
+                  </div>
+                  <div style={{ padding: 20 }}>
+                    <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)', marginBottom: 8 }}>
+                      {TIER_NAMES[ticket.tierId as keyof typeof TIER_NAMES] || ticket.name}
+                    </div>
+                    <h3 style={{ margin: '0 0 12px', fontSize: 18 }}>Blockpass Ticket</h3>
+                    <div className="bp-mono" style={{ fontSize: 11, color: 'var(--bp-muted)', marginBottom: 16 }}>
+                      {TIER_PRICES[ticket.tierId as keyof typeof TIER_PRICES] || '—'} ETH each
+                    </div>
+                    <Link href="/event/evt-web3-dev-connect" className="bp-btn" style={{ width: '100%' }}>
+                      View Event
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tab === 1 && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-muted)', padding: 48 }}>POAP history coming soon.</p>}
+          {tab === 2 && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-muted)', padding: 48 }}>Secondary listings not active yet.</p>}
+        </div>
+        <Footer />
       </div>
-      <Footer />
     </main>
   );
 }

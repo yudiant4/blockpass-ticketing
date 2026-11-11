@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { css } from 'styled-system/css';
+import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { Calendar, MapPin, Clock, Shield } from 'lucide-react';
-import TierCard from '@/components/TierCard';
+import { Calendar, Clock, MapPin, Shield } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import TierCard from '@/components/TierCard';
 import { apiUrl } from '@/lib/api';
+import { EmeraldHorizon, SceneFrame, UplinkLoader } from '@/components/three/ClientScenes';
 
 interface Tier {
   tierId: string;
@@ -47,13 +48,13 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
     const timer = setTimeout(() => ctrl.abort(), 12000);
 
     fetch(apiUrl(`/api/events/${params.id}`), { signal: ctrl.signal })
-      .then(r => r.json())
-      .then(d => {
+      .then((r) => r.json())
+      .then((d) => {
         if (cancelled) return;
         if (d.status === 'success') setEvent(d.data);
         else setError(d.message || 'Event not found');
       })
-      .catch(e => {
+      .catch((e) => {
         if (cancelled) return;
         setError(e.name === 'AbortError' ? 'Request timed out' : e.message);
       })
@@ -69,122 +70,98 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
     };
   }, [params.id]);
 
-  if (loading) return (
-    <main className={css({ minHeight: '100vh', bg: 'gray.900', display: 'flex', alignItems: 'center', justifyContent: 'center' })}>
-      <Navbar />
-      <p className={css({ fontFamily: 'mono', color: 'neon', textTransform: 'uppercase', letterSpacing: '0.15em' })}>LOADING...</p>
-    </main>
-  );
+  if (loading) {
+    return (
+      <main className="bp-page" style={{ display: 'grid', placeItems: 'center' }}>
+        <Navbar />
+        <UplinkLoader style={{ width: 180, height: 180 }} />
+      </main>
+    );
+  }
 
-  if (error || !event) return (
-    <main className={css({ minHeight: '100vh', bg: 'gray.900', display: 'flex', alignItems: 'center', justifyContent: 'center' })}>
-      <Navbar />
-      <p className={css({ fontFamily: 'mono', color: 'red.400', textTransform: 'uppercase' })}>{error || 'EVENT NOT FOUND'}</p>
-    </main>
-  );
+  if (error || !event) {
+    return (
+      <main className="bp-page" style={{ display: 'grid', placeItems: 'center' }}>
+        <Navbar />
+        <p className="bp-mono" style={{ color: 'var(--bp-neon3)' }}>
+          {error || 'EVENT NOT FOUND'}
+        </p>
+      </main>
+    );
+  }
 
   const isEnded = event.status === 'Ended' || new Date(event.endDate) < new Date();
   const isLive = !isEnded && new Date(event.startDate) <= new Date();
   const eventDate = new Date(event.startDate);
   const endDate = new Date(event.endDate);
-
   const formatDate = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
   const formatTime = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <main className={css({ minHeight: '100vh', bg: 'gray.900' })}>
+    <main className="bp-page">
       <Navbar />
-      {/* Hero Banner */}
-      <div className={css({ position: 'relative', w: 'full', h: '300px', overflow: 'hidden', mt: '16' })}>
-        {event.bannerUrl ? (
-          <img src={event.bannerUrl} alt={event.title}
-            className={css({ w: 'full', h: 'full', objectFit: 'cover' })} />
-        ) : (
-          <div className={css({ w: 'full', h: 'full', bg: 'gray.800' })} />
-        )}
-        {/* Gradient overlay */}
-        <div className={css({
-          position: 'absolute', bottom: 0, left: 0, right: 0, h: '50%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.95), transparent)',
-        })} />
-        {/* Status badge */}
-        <div className={css({ position: 'absolute', top: '4', left: '4', display: 'flex', gap: '2' })}>
-          <span className={css({
-            fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em',
-            px: '3', py: '1', rounded: 'md', fontWeight: 'bold',
-            bg: isEnded ? 'gray.700' : isLive ? 'emerald.600' : 'neon',
-            color: isEnded ? 'gray.400' : isLive ? 'white' : 'black',
-          })}>
-            {isEnded ? 'ENDED' : isLive ? 'LIVE NOW' : 'UPCOMING'}
-          </span>
-          <span className={css({
-            fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em',
-            px: '3', py: '1', rounded: 'md', fontWeight: 'bold',
-            bg: 'rgba(0,0,0,0.6)', color: 'neon', border: '1px solid rgba(0,245,196,0.3)',
-          })}>
-            {event.category}
-          </span>
-        </div>
-      </div>
+      <div className="bp-content">
+        <SceneFrame height={280} style={{ borderRadius: 0, marginTop: 72 }}>
+          {event.bannerUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={event.bannerUrl} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <EmeraldHorizon speed={1} glow={1.1} hue={0.12} />
+          )}
+        </SceneFrame>
 
-      <div className={css({ maxW: '5xl', mx: 'auto', px: '4', mt: '-16', position: 'relative', zIndex: 10 })}>
-        {/* Event Info Card */}
-        <div className={css({
-          bg: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)', rounded: 'lg', p: '6', mb: '8',
-        })}>
-          <h1 className={css({ fontSize: '3xl', fontWeight: 'bold', color: 'white', mb: '2' })}>{event.title}</h1>
-          <p className={css({ color: 'gray.400', mb: '6', lineHeight: 'relaxed' })}>{event.description}</p>
-
-          {/* Metadata row */}
-          <div className={css({ display: 'flex', flexWrap: 'wrap', gap: '6' })}>
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '2' })}>
-              <Calendar size={16} className={css({ color: 'neon' })} />
-              <span className={css({ fontFamily: 'mono', fontSize: 'sm', color: 'gray.300' })}>
-                {formatDate(eventDate)} - {formatDate(endDate)}
+        <div style={{ maxWidth: 1000, margin: '-48px auto 40px', padding: '0 24px', position: 'relative', zIndex: 3 }}>
+          <div className="bp-glass" style={{ padding: 28, marginBottom: 28 }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+              <span className="bp-mono" style={{ fontSize: 10, padding: '4px 10px', borderRadius: 8, background: isEnded ? '#333' : isLive ? '#059669' : 'var(--bp-neon)', color: isEnded ? '#aaa' : isLive ? '#fff' : '#04110d', fontWeight: 700 }}>
+                {isEnded ? 'ENDED' : isLive ? 'LIVE NOW' : 'UPCOMING'}
+              </span>
+              <span className="bp-mono" style={{ fontSize: 10, padding: '4px 10px', borderRadius: 8, border: '1px solid rgba(0,245,196,0.35)', color: 'var(--bp-neon)' }}>
+                {event.category}
               </span>
             </div>
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '2' })}>
-              <Clock size={16} className={css({ color: 'neon' })} />
-              <span className={css({ fontFamily: 'mono', fontSize: 'sm', color: 'gray.300' })}>
-                {formatTime(eventDate)} - {formatTime(endDate)}
-              </span>
+            <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, margin: '0 0 10px' }}>{event.title}</h1>
+            <p style={{ color: 'var(--bp-muted)', lineHeight: 1.7, marginBottom: 20 }}>{event.description}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Calendar size={16} color="var(--bp-neon)" />
+                <span className="bp-mono" style={{ fontSize: 12 }}>
+                  {formatDate(eventDate)} - {formatDate(endDate)}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Clock size={16} color="var(--bp-neon)" />
+                <span className="bp-mono" style={{ fontSize: 12 }}>
+                  {formatTime(eventDate)} - {formatTime(endDate)}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <MapPin size={16} color="var(--bp-neon)" />
+                <span className="bp-mono" style={{ fontSize: 12 }}>
+                  {event.location}
+                </span>
+              </div>
             </div>
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '2' })}>
-              <MapPin size={16} className={css({ color: 'neon' })} />
-              <span className={css({ fontFamily: 'mono', fontSize: 'sm', color: 'gray.300' })}>{event.location}</span>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 14 }}>
+              <Shield size={14} color="var(--bp-muted)" />
+              <span className="bp-mono" style={{ fontSize: 11, color: 'var(--bp-muted)' }}>
+                ORGANIZER: {event.createdBy?.slice(0, 6)}...{event.createdBy?.slice(-4)}
+              </span>
             </div>
           </div>
 
-          {/* Organizer */}
-          <div className={css({ display: 'flex', alignItems: 'center', gap: '2', mt: '4' })}>
-            <Shield size={14} className={css({ color: 'gray.500' })} />
-            <span className={css({ fontFamily: 'mono', fontSize: 'xs', color: 'gray.500' })}>
-              ORGANIZER: {event.createdBy?.slice(0, 6)}...{event.createdBy?.slice(-4)}
-            </span>
-          </div>
-        </div>
-
-        {/* Tier Cards Grid */}
-        <div className={css({ mb: '8' })}>
-          <div className={css({ display: 'flex', alignItems: 'center', gap: '3', mb: '6' })}>
-            <div className={css({ w: '2', h: '8', bg: 'neon' })} />
-            <h2 className={css({ fontFamily: 'mono', fontSize: 'lg', fontWeight: '700', color: 'white', textTransform: 'uppercase', letterSpacing: '0.1em' })}>
-              AVAILABLE TIERS
+          <div style={{ marginBottom: 20 }}>
+            <h2 className="bp-mono" style={{ fontSize: 16, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 18 }}>
+              Available Tiers
             </h2>
-          </div>
-          <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', md: 'repeat(auto-fit, minmax(280px, 1fr))' }, gap: '4' })}>
-            {event.tiers.map((tier) => (
-              <TierCard
-                key={tier.tierId}
-                tier={tier}
-                eventId={event._id}
-                isEnded={isEnded}
-                walletAddress={address}
-              />
-            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+              {event.tiers.map((tier) => (
+                <TierCard key={tier.tierId} tier={tier} eventId={event._id} isEnded={isEnded} walletAddress={address} />
+              ))}
+            </div>
           </div>
         </div>
+        <Footer />
       </div>
     </main>
   );
