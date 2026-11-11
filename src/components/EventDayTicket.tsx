@@ -20,7 +20,7 @@ export default function QRCodeScanner({
   onInvalid,
 }: QRCodeScannerProps) {
   const [scanning, setScanning] = useState(true);
-  const [message, setMessage] = useState('Silakan tunjukkan QR Code tiket Anda');
+  const [message, setMessage] = useState('Present your ticket QR code');
   const [minutesLeft, setMinutesLeft] = useState<number | null>(null);
   const endMs = endsAt ? new Date(endsAt).getTime() : Date.now() + 24 * 60 * 60 * 1000;
 
@@ -84,8 +84,10 @@ export default function QRCodeScanner({
         borderColor: 'border',
       })}
     >
-      <h3 className={css({ color: 'text', mb: '4', fontFamily: 'mono' })}>Verifikasi Tiket</h3>
-      <p className={css({ color: 'muted', mb: '4', fontFamily: 'mono', fontSize: '13px' })}>{message}</p>
+      <h3 className={css({ color: 'text', mb: '4', fontFamily: 'mono' })}>Ticket Verification</h3>
+      <p className={css({ color: 'muted', mb: '4', fontFamily: 'mono', fontSize: '13px' })}>
+        {message}
+      </p>
       {minutesLeft !== null && (
         <p className={css({ color: 'neon', mb: '4', fontFamily: 'mono', fontSize: '11px' })}>
           Window closes in ~{Math.max(0, minutesLeft)} min

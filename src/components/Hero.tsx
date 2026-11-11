@@ -42,7 +42,6 @@ export default function Hero() {
           alignItems: 'center',
           gap: '12px',
           marginBottom: '28px',
-          animation: 'fadeUp 0.8s ease forwards',
         })}
       >
         Blockpass · Web3 Ticketing Protocol
@@ -55,19 +54,11 @@ export default function Hero() {
           lineHeight: '0.9',
           letterSpacing: '-0.03em',
           marginBottom: '32px',
-          animation: 'fadeUp 0.8s 0.1s ease forwards',
         })}
       >
         <span className={css({ color: 'neon' })}>BLOCK</span>PASS<br />
         FOR <span className={css({ color: 'neon' })}>LIVE</span><br />
-        <span
-          className={css({
-            WebkitTextStroke: '1.5px token(colors.neon3)',
-            color: 'transparent',
-          })}
-        >
-          EVENTS.
-        </span>
+        <span className={css({ color: 'neon3' })}>EVENTS.</span>
       </h1>
 
       <p
@@ -78,7 +69,6 @@ export default function Hero() {
           color: 'muted',
           maxWidth: '480px',
           marginBottom: '48px',
-          animation: 'fadeUp 0.8s 0.2s ease forwards',
         })}
       >
         Mint, trade, and verify event tickets as NFTs on-chain. Zero fraud. Full ownership. Instant secondary market.
@@ -90,7 +80,6 @@ export default function Hero() {
           gap: '16px',
           alignItems: 'center',
           flexWrap: 'wrap',
-          animation: 'fadeUp 0.8s 0.3s ease forwards',
         })}
       >
         {/* Mengarah ke Marketplace */}

@@ -148,7 +148,7 @@ export default function MarketplacePage() {
                 animation: 'blink 2s infinite',
               })}
             />
-            TRENDING & FEATURED {loading ? '· LOADING' : ''}
+            TRENDING & FEATURED{loading && events.length === 0 ? ' · LOADING' : ''}
           </div>
           <div
             className={css({

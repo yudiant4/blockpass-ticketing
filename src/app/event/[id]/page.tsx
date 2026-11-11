@@ -42,14 +42,31 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(apiUrl(`/api/events/${params.id}`))
+    let cancelled = false;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12000);
+
+    fetch(apiUrl(`/api/events/${params.id}`), { signal: ctrl.signal })
       .then(r => r.json())
       .then(d => {
+        if (cancelled) return;
         if (d.status === 'success') setEvent(d.data);
         else setError(d.message || 'Event not found');
       })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
+      .catch(e => {
+        if (cancelled) return;
+        setError(e.name === 'AbortError' ? 'Request timed out' : e.message);
+      })
+      .finally(() => {
+        clearTimeout(timer);
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      ctrl.abort();
+    };
   }, [params.id]);
 
   if (loading) return (
