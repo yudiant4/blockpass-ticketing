@@ -16,34 +16,36 @@ import { sepolia, baseSepolia } from 'wagmi/chains';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import '@rainbow-me/rainbowkit/styles.css';
 
-// WalletConnect Project ID. Make sure NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID exists in .env.local
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+// WalletConnect Project ID — optional for injected/MetaMask-only local use
+const projectId =
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ||
+  '00000000000000000000000000000000';
 
-if (!projectId) {
-  throw new Error(
-    'Missing NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID. Add it to .env.local or set it in your environment.'
-  );
-}
+const wallets = projectId && projectId !== '00000000000000000000000000000000'
+  ? [injectedWallet, metaMaskWallet, walletConnectWallet]
+  : [injectedWallet, metaMaskWallet];
 
 const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended',
-      // Pass wallet functions (not invoked) — RainbowKit injects connectors at mount
-      wallets: [injectedWallet, metaMaskWallet, walletConnectWallet],
+      wallets,
     },
   ],
-  { projectId, appName: 'TicketPro' }
+  { projectId, appName: 'Blockpass' }
 );
 
-const sepoliaRpc = process.env.NEXT_PUBLIC_SEPOLIA_RPC || 'https://ethereum-sepolia-rpc.publicnode.com';
+const sepoliaRpc =
+  process.env.NEXT_PUBLIC_SEPOLIA_RPC || 'https://ethereum-sepolia-rpc.publicnode.com';
+const baseSepoliaRpc =
+  process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || 'https://sepolia.base.org';
 
 export const config = createConfig({
   connectors,
-  chains: [sepolia, baseSepolia],
+  chains: [baseSepolia, sepolia],
   transports: {
+    [baseSepolia.id]: http(baseSepoliaRpc),
     [sepolia.id]: http(sepoliaRpc),
-    [baseSepolia.id]: http('https://sepolia.base.org'),
   },
   ssr: true,
 });
@@ -54,7 +56,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()}>{children}</RainbowKitProvider>
+        <RainbowKitProvider theme={darkTheme()} initialChain={baseSepolia}>
+          {children}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

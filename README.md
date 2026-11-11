@@ -1,66 +1,64 @@
-## Foundry (updated)
+# Blockpass Ticketing
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Web3 NFT ticketing platform — mint, manage, and verify event tickets as ERC-1155 tokens on Base Sepolia.
 
-Foundry consists of:
+## Stack
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- **Frontend:** Next.js 14, RainbowKit, Wagmi, Viem, Panda CSS
+- **Contract:** `BlockpassTicket.sol` (ERC-1155, AccessControl, Pausable)
+- **API:** Next.js route handlers with file-backed event store (`data/events.json`)
+- **Optional backend:** Express + MongoDB under `server/`
 
-## Documentation
+## Quick start
 
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```bash
+npm install
+cp .env.example .env.local   # optional WalletConnect project ID
+npm run dev
 ```
 
-### Test
+Open [http://localhost:3000](http://localhost:3000).
 
-```shell
-$ forge test
+### Features
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing — marketplace preview, How It Works, Docs |
+| `/marketplace` | Search / filter / sort live events from API |
+| `/event/[id]` | Event detail + on-chain mint via wallet |
+| `/create-event` | Organizer form (requires connected wallet) |
+| `/profile` | On-chain ticket balances for connected wallet |
+| `/login` | Wallet connect gate |
+
+### API (Next.js)
+
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/api/events` | List events |
+| POST | `/api/events` | Create (header `x-admin-wallet`) |
+| GET | `/api/events/:id` | Detail |
+| DELETE | `/api/events/:id` | Delete (organizer/admin) |
+| POST | `/api/events/:id/buy-intent` | Soft reserve (no sold bump) |
+| POST | `/api/events/:id/confirm-mint` | Confirm sold after tx |
+| GET/POST | `/api/ticket` | Verify / quote (never send private keys) |
+
+To use the Express/Mongo backend instead, set `BACKEND_URL` / `NEXT_PUBLIC_API_URL` and run `server/`.
+
+## Smart contract
+
+```bash
+# Foundry
+forge build
+forge test
+forge script script/DeployBlockpassTicket.s.sol --rpc-url $RPC --broadcast
 ```
 
-### Format
+Default address (Base Sepolia): see `NEXT_PUBLIC_BLOCKPASS_ADDRESS`.
 
-```shell
-$ forge fmt
-```
+Tiers: `1` Regular (0.001 ETH), `2` VIP (0.003 ETH), `3` VVIP (0.01 ETH).
 
-### Gas Snapshots
+## Security notes
 
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- Minting is **client-side via wagmi** — never POST a private key to the API.
+- `cancelTicket(holder, id, amount)` refunds the ticket holder (admin/organizer only).
+- Excess ETH on mint is refunded automatically.

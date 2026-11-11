@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { css } from '../../../styled-system/css';
 import { useAccount, useDisconnect } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import Navbar from '@/components/Navbar';
 
 export default function LoginPage() {
     const { isConnected, address } = useAccount();
@@ -11,6 +12,7 @@ export default function LoginPage() {
 
     return (
         <main className={css({ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 20px' })}>
+            <Navbar />
             <div className={css({
                 width: '100%', maxWidth: '440px',
                 background: 'surface', border: '1px solid token(colors.neon)',

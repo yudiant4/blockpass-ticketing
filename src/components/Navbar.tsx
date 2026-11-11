@@ -16,7 +16,7 @@ export default function Navbar() {
     const baseNavLinks = [
         { name: 'Marketplace', path: '/marketplace' },
         { name: 'Create Event', path: '/create-event' },
-        // { name: 'Events', path: '/event' }, // removed – Marketplace covers events
+        { name: 'Verify', path: '/verify' },
         { name: 'How It Works', path: '/#how-it-works' },
         { name: 'Docs', path: '/#docs' },
         { name: 'Sign In', path: '/login' },

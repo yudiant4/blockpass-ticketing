@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { css } from 'styled-system/css';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { Calendar, MapPin, Users, Clock, CheckCircle, XCircle, Shield } from 'lucide-react';
+import { useAccount } from 'wagmi';
+import { Calendar, MapPin, Clock, Shield } from 'lucide-react';
 import TierCard from '@/components/TierCard';
+import Navbar from '@/components/Navbar';
+import { apiUrl } from '@/lib/api';
 
 interface Tier {
   tierId: string;
@@ -15,6 +17,7 @@ interface Tier {
   maxPerWallet: number;
   perks: string[];
   customFields: string[];
+  onChainTierId?: number;
 }
 
 interface EventData {
@@ -39,7 +42,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://129.226.95.94:3002'}/api/events/${params.id}`)
+    fetch(apiUrl(`/api/events/${params.id}`))
       .then(r => r.json())
       .then(d => {
         if (d.status === 'success') setEvent(d.data);
@@ -51,12 +54,14 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   if (loading) return (
     <main className={css({ minHeight: '100vh', bg: 'gray.900', display: 'flex', alignItems: 'center', justifyContent: 'center' })}>
+      <Navbar />
       <p className={css({ fontFamily: 'mono', color: 'neon', textTransform: 'uppercase', letterSpacing: '0.15em' })}>LOADING...</p>
     </main>
   );
 
   if (error || !event) return (
     <main className={css({ minHeight: '100vh', bg: 'gray.900', display: 'flex', alignItems: 'center', justifyContent: 'center' })}>
+      <Navbar />
       <p className={css({ fontFamily: 'mono', color: 'red.400', textTransform: 'uppercase' })}>{error || 'EVENT NOT FOUND'}</p>
     </main>
   );
@@ -71,8 +76,9 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
 
   return (
     <main className={css({ minHeight: '100vh', bg: 'gray.900' })}>
+      <Navbar />
       {/* Hero Banner */}
-      <div className={css({ position: 'relative', w: 'full', h: '300px', overflow: 'hidden' })}>
+      <div className={css({ position: 'relative', w: 'full', h: '300px', overflow: 'hidden', mt: '16' })}>
         {event.bannerUrl ? (
           <img src={event.bannerUrl} alt={event.title}
             className={css({ w: 'full', h: 'full', objectFit: 'cover' })} />

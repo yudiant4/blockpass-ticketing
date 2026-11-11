@@ -30,3 +30,6 @@ docs/
 .env.*
 !.env.example
 .env.local
+
+# Local file-backed event store
+data/

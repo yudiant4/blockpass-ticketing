@@ -21,7 +21,7 @@ export default function Footer() {
                 })}
             >
                 <div className={css({ fontSize: '13px', color: 'rgba(255,255,255,0.4)' })}>
-                    © 2026 TicketPro. All rights reserved.
+                    © 2026 Blockpass. All rights reserved.
                 </div>
                 <div className={css({ display: 'flex', gap: '24px' })}>
                     {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (

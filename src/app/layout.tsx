@@ -6,8 +6,8 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'TicketPro - Web3 Ticketing Platform',
-  description: 'NFT-based Ticketing Platform',
+  title: 'Blockpass — Web3 Ticketing Platform',
+  description: 'Mint, trade, and verify event tickets as NFTs on-chain.',
 };
 
 export default function RootLayout({

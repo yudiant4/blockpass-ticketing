@@ -5,6 +5,9 @@ import { css } from 'styled-system/css';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { FileText, Layers, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Navbar from '@/components/Navbar';
+import { apiUrl } from '@/lib/api';
 
 interface Tier {
   tierId: string;
@@ -18,6 +21,7 @@ interface Tier {
 
 export default function CreateEventPage() {
   const { address: adminWallet, isConnected } = useAccount();
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -75,7 +79,7 @@ export default function CreateEventPage() {
     setSubmitting(true);
     setMessage('');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://129.226.95.94:3002'}/api/events`, {
+      const res = await fetch(apiUrl('/api/events'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,8 +100,12 @@ export default function CreateEventPage() {
       const data = await res.json();
       if (data.status === 'success') {
         setMessage('Event created successfully');
+        const id = data.data?._id;
+        if (id) {
+          setTimeout(() => router.push(`/event/${id}`), 800);
+        }
       } else {
-        setMessage(data.message);
+        setMessage(data.message || 'Gagal membuat event');
       }
     } catch (e: any) {
       setMessage(e.message);
@@ -110,6 +118,7 @@ export default function CreateEventPage() {
   if (!isConnected) {
     return (
       <main className={css({ minHeight: '100vh', bg: 'gray.900', py: '24', px: '4', display: 'flex', alignItems: 'center', justifyContent: 'center' })}>
+        <Navbar />
         <div className={css({
           bg: 'rgba(255,255,255,0.02)',
           backdropFilter: 'blur(12px)',
@@ -153,7 +162,8 @@ export default function CreateEventPage() {
 
   return (
     <main className={css({ minHeight: '100vh', bg: 'gray.900', py: '24', px: '4' })}>
-      <div className={css({ maxW: '4xl', mx: 'auto' })}>
+      <Navbar />
+      <div className={css({ maxW: '4xl', mx: 'auto', pt: '16' })}>
         <h1 className={css({ fontSize: '3xl', fontWeight: 'bold', color: 'white', mb: '6' })}>CREATE NEW EVENT</h1>
 
         <section className={css({
@@ -171,7 +181,7 @@ export default function CreateEventPage() {
               <span className={css({ fontSize: 'lg', fontWeight: '600' })}>General Information</span>
             </div>
           </div>
-          <div className={css({ gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
+          <div className={css({ display: 'grid', gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
             <label className={css({ display: 'block' })}>
               <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>TITLE<span className={css({ color: 'neon' })}>*</span></span>
               <input type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
@@ -252,7 +262,7 @@ export default function CreateEventPage() {
                   <button onClick={() => removeTier(i)} className={css({ color: 'red.400', fontSize: 'sm', cursor: 'pointer', fontFamily: 'mono' })}>REMOVE</button>
                 )}
               </div>
-              <div className={css({ gap: '3', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
+              <div className={css({ display: 'grid', gap: '3', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
                 <label className={css({ display: 'block' })}>
                   <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>TIER NAME<span className={css({ color: 'neon' })}>*</span></span>
                   <input type="text" value={tier.tierName} onChange={e => updateTier(i, 'tierName', e.target.value)}
@@ -309,7 +319,7 @@ export default function CreateEventPage() {
               <span className={css({ fontSize: 'lg', fontWeight: '600' })}>Summary</span>
             </div>
           </div>
-          <div className={css({ gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(3,1fr)' } })}>
+          <div className={css({ display: 'grid', gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(3,1fr)' } })}>
             <div className={css({ textAlign: 'center', p: '3', bg: 'gray.800', rounded: 'md' })}>
               <p className={css({ fontFamily: 'mono', textXs: true, color: 'gray.400', textTransform: 'uppercase' })}>TOTAL QUOTA</p>
               <p className={css({ fontSize: '2xl', fontWeight: 'bold', color: 'neon' })}>{totalQuota}</p>

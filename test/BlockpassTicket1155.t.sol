@@ -90,5 +90,40 @@ contract BlockpassTicket1155Test is Test {
         assertGt(admin.balance, balanceBefore);
     }
 
+    function test_RefundExcessPayment() public {
+        vm.deal(buyer, 1 ether);
+        uint256 before = buyer.balance;
+        vm.prank(buyer);
+        ticket.mintTicket{value: 0.005 ether}(1, 1); // price 0.001
+        // buyer should get 0.004 refunded → net spend 0.001
+        assertEq(buyer.balance, before - 0.001 ether);
+        assertEq(ticket.balanceOf(buyer, 1), 1);
+    }
+
+    function test_CancelTicket_RefundsHolder() public {
+        vm.deal(buyer, 1 ether);
+        vm.prank(buyer);
+        ticket.mintTicket{value: 0.001 ether}(1, 1);
+
+        uint256 before = buyer.balance;
+        vm.prank(admin);
+        ticket.cancelTicket(buyer, 1, 1);
+
+        assertEq(ticket.balanceOf(buyer, 1), 0);
+        assertEq(buyer.balance, before + 0.001 ether);
+        (, uint256 currentSupply,,) = ticket.tiers(1);
+        assertEq(currentSupply, 0);
+    }
+
+    function test_CancelTicket_Unauthorized() public {
+        vm.deal(buyer, 1 ether);
+        vm.prank(buyer);
+        ticket.mintTicket{value: 0.001 ether}(1, 1);
+
+        vm.prank(buyer);
+        vm.expectRevert("Unauthorized");
+        ticket.cancelTicket(buyer, 1, 1);
+    }
+
     receive() external payable {}
 }

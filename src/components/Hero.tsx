@@ -45,7 +45,7 @@ export default function Hero() {
           animation: 'fadeUp 0.8s ease forwards',
         })}
       >
-        Web3 Ticketing Protocol — On-chain
+        Blockpass · Web3 Ticketing Protocol
       </div>
 
       <h1
@@ -58,8 +58,8 @@ export default function Hero() {
           animation: 'fadeUp 0.8s 0.1s ease forwards',
         })}
       >
-        THE FUTURE<br />
-        OF <span className={css({ color: 'neon' })}>LIVE</span><br />
+        <span className={css({ color: 'neon' })}>BLOCK</span>PASS<br />
+        FOR <span className={css({ color: 'neon' })}>LIVE</span><br />
         <span
           className={css({
             WebkitTextStroke: '1.5px token(colors.neon3)',
