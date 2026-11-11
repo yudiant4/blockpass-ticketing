@@ -109,14 +109,46 @@ router.post('/:id/buy-intent', async (req: Request, res: Response) => {
     if (available < quantity) return res.status(400).json({ status: 'error', message: `Kuota tidak cukup (tersisa ${available})` });
     if (quantity > tier.maxPerWallet) return res.status(400).json({ status: 'error', message: `Maksimal ${tier.maxPerWallet} per wallet` });
 
-    // Atomic increment sold
+    // Soft reserve only — increment sold after on-chain mint via confirm-mint
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        eventId: event._id,
+        tierId,
+        quantity,
+        remaining: available,
+        priceEth: tier.price,
+        wallet,
+        reserved: true,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+// POST /api/events/:id/confirm-mint — bump sold after successful on-chain mint
+router.post('/:id/confirm-mint', async (req: Request, res: Response) => {
+  try {
+    const { tierId, quantity = 1, txHash } = req.body;
+    if (!tierId) return res.status(400).json({ status: 'error', message: 'tierId wajib' });
+
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ status: 'error', message: 'Acara tidak ditemukan' });
+
+    const tier = event.tiers.find(t => t.tierId === tierId);
+    if (!tier) return res.status(404).json({ status: 'error', message: 'Tier tidak ditemukan' });
+
+    const available = tier.quota - tier.sold;
+    if (available < quantity) return res.status(400).json({ status: 'error', message: `Kuota tidak cukup (tersisa ${available})` });
+
     tier.sold += quantity;
     event.markModified('tiers');
     await event.save();
 
     return res.status(200).json({
       status: 'success',
-      data: { eventId: event._id, tierId, quantity, remaining: available - quantity },
+      data: { eventId: event._id, tierId, quantity, sold: tier.sold, remaining: tier.quota - tier.sold, txHash: txHash || null },
     });
   } catch (error: any) {
     return res.status(500).json({ status: 'error', message: error.message });

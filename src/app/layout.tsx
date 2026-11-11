@@ -1,26 +1,26 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Syne, Space_Mono } from 'next/font/google';
+import '@designcodeio/threeui/style.css';
 import './globals.css';
 import { Providers } from './providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const syne = Syne({ subsets: ['latin'], variable: '--font-syne' });
+const spaceMono = Space_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-space',
+});
 
 export const metadata: Metadata = {
-  title: 'TicketPro - Web3 Ticketing Platform',
-  description: 'NFT-based Ticketing Platform',
+  title: 'Blockpass — Web3 Ticketing · ThreeUI Kage',
+  description: 'Mint, trade, and verify event tickets as NFTs — home powered by ThreeUI KageLandingPage.',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Providers>
-          {children}
-        </Providers>
+      <body className={`${syne.variable} ${spaceMono.variable}`}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,142 +1,87 @@
+'use client';
+
 import Link from 'next/link';
-import { css } from '../../styled-system/css';
+import {
+  EmeraldHorizon,
+  LiquidMetalButton,
+  ParticleWordmark,
+  SceneFrame,
+} from './three/ClientScenes';
 
 export default function Hero() {
   return (
     <section
-      className={css({
+      style={{
         position: 'relative',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: { base: '100px 20px 60px', md: '140px 60px 80px' },
-        zIndex: 1,
+        padding: '120px 24px 80px',
         overflow: 'hidden',
-      })}
+      }}
     >
-      {/* Background Glow Blobs */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.85 }}>
+        <EmeraldHorizon speed={1.1} glow={1.2} hue={0.08} className="bp-hero-horizon" />
+      </div>
       <div
-        className={css({
+        style={{
           position: 'absolute',
-          borderRadius: '50%',
-          filter: 'blur(100px)',
-          pointerEvents: 'none',
-          animation: 'pulseBlob 8s ease-in-out infinite alternate',
-          width: { base: '300px', md: '600px' },
-          height: { base: '300px', md: '600px' },
-          background: 'radial-gradient(circle, rgba(123,47,255,0.2), transparent 70%)',
-          top: '-100px',
-          right: '-100px',
-        })}
+          inset: 0,
+          zIndex: 1,
+          background:
+            'linear-gradient(180deg, rgba(5,7,12,0.15) 0%, rgba(5,7,12,0.55) 55%, rgba(5,7,12,0.92) 100%)',
+        }}
       />
 
-      <div
-        className={css({
-          fontFamily: 'mono',
-          fontSize: '11px',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          color: 'neon',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          marginBottom: '28px',
-          animation: 'fadeUp 0.8s ease forwards',
-        })}
-      >
-        Web3 Ticketing Protocol — On-chain
-      </div>
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+        <div className="bp-mono" style={{ color: 'var(--bp-neon)', fontSize: 11, letterSpacing: '0.28em', marginBottom: 20 }}>
+          BLOCKPASS · POWERED BY THREEUI
+        </div>
 
-      <h1
-        className={css({
-          fontSize: 'clamp(36px, 7vw, 110px)',
-          fontWeight: '800',
-          lineHeight: '0.9',
-          letterSpacing: '-0.03em',
-          marginBottom: '32px',
-          animation: 'fadeUp 0.8s 0.1s ease forwards',
-        })}
-      >
-        THE FUTURE<br />
-        OF <span className={css({ color: 'neon' })}>LIVE</span><br />
-        <span
-          className={css({
-            WebkitTextStroke: '1.5px token(colors.neon3)',
-            color: 'transparent',
-          })}
+        <SceneFrame height={180} style={{ marginBottom: 18, borderRadius: 20 }}>
+          <ParticleWordmark mode="dark" hue={0.55} saturation={1.1} brightness={1.05} />
+        </SceneFrame>
+
+        <h1
+          style={{
+            fontSize: 'clamp(40px, 8vw, 96px)',
+            fontWeight: 800,
+            lineHeight: 0.92,
+            letterSpacing: '-0.03em',
+            margin: '0 0 24px',
+            maxWidth: 820,
+          }}
         >
-          EVENTS.
-        </span>
-      </h1>
+          BLOCK<span style={{ color: 'var(--bp-neon)' }}>PASS</span>
+          <br />
+          FOR <span style={{ color: 'var(--bp-neon)' }}>LIVE</span>
+          <br />
+          <span style={{ color: 'var(--bp-neon3)' }}>EVENTS.</span>
+        </h1>
 
-      <p
-        className={css({
-          fontFamily: 'mono',
-          fontSize: '14px',
-          lineHeight: '1.8',
-          color: 'muted',
-          maxWidth: '480px',
-          marginBottom: '48px',
-          animation: 'fadeUp 0.8s 0.2s ease forwards',
-        })}
-      >
-        Mint, trade, and verify event tickets as NFTs on-chain. Zero fraud. Full ownership. Instant secondary market.
-      </p>
+        <p
+          className="bp-mono"
+          style={{
+            fontSize: 14,
+            lineHeight: 1.8,
+            color: 'var(--bp-muted)',
+            maxWidth: 520,
+            marginBottom: 36,
+          }}
+        >
+          Mint, trade, and verify event tickets as NFTs on-chain — wrapped in ThreeUI motion fields,
+          liquid metal CTAs, and neon particle type.
+        </p>
 
-      <div
-        className={css({
-          display: 'flex',
-          gap: '16px',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          animation: 'fadeUp 0.8s 0.3s ease forwards',
-        })}
-      >
-        {/* Mengarah ke Marketplace */}
-        <Link href="/marketplace" className={css({ textDecoration: 'none' })}>
-          <button
-            className={css({
-              fontFamily: 'mono',
-              fontSize: '13px',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              background: 'neon',
-              color: 'bg',
-              padding: '14px 32px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '700',
-              transition: 'box-shadow 0.2s, transform 0.15s',
-              _hover: {
-                boxShadow: '0 0 40px rgba(0,245,196,0.5)',
-                transform: 'translateY(-2px)',
-              },
-            })}
-          >
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Link href="/marketplace" className="bp-btn bp-btn-solid">
             Explore Tickets
-          </button>
-        </Link>
-
-        <Link href="/login" className={css({ textDecoration: 'none' })}>
-          <button
-            className={css({
-              fontFamily: 'mono',
-              fontSize: '13px',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              background: 'transparent',
-              color: 'text',
-              padding: '14px 32px',
-              border: '1px solid token(colors.border)',
-              cursor: 'pointer',
-              transition: 'border-color 0.2s, color 0.2s',
-              _hover: { borderColor: 'muted', color: 'neon' },
-            })}
-          >
-            Sign In →
-          </button>
-        </Link>
+          </Link>
+          <LiquidMetalButton text="Sign In" variant="pill" rendering="colored" onClick={() => {
+            window.location.href = '/login';
+          }} />
+        </div>
       </div>
     </section>
   );

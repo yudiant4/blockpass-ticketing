@@ -1,56 +1,67 @@
-import { css } from '../../styled-system/css';
+'use client';
 
 export default function Ticker() {
-    const items = [
-        'NFT Ticketing',
-        'Blockchain Verified',
-        'Zero Fraud',
-        'Secondary Market',
-        'Smart Contract Royalties',
-        'Decentralized',
-    ];
+  const items = [
+    'ThreeUI Motion',
+    'NFT Ticketing',
+    'Blockchain Verified',
+    'Zero Fraud',
+    'Secondary Market',
+    'Smart Contract Royalties',
+    'Decentralized',
+  ];
 
-    return (
-        <div
-            className={css({
-                position: 'relative',
-                zIndex: 1,
-                borderTop: '1px solid token(colors.border)',
-                borderBottom: '1px solid token(colors.border)',
-                padding: '14px 0',
-                overflow: 'hidden',
-                background: 'rgba(13,16,23,0.6)',
-            })}
-        >
-            <div
-                className={css({
-                    display: 'flex',
-                    gap: '60px',
-                    animation: 'ticker 22s linear infinite',
-                    whiteSpace: 'nowrap',
-                    width: 'max-content',
-                })}
-            >
-                {[...items, ...items].map((text, idx) => (
-                    <div
-                        key={idx}
-                        className={css({
-                            fontFamily: 'mono',
-                            fontSize: '11px',
-                            letterSpacing: '0.15em',
-                            textTransform: 'uppercase',
-                            color: 'muted',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            flexShrink: 0,
-                        })}
-                    >
-                        <span className={css({ color: 'neon' })}>✦</span> {text}{' '}
-                        <span className={css({ color: 'neon3', marginLeft: '12px' })}>◆</span>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+  return (
+    <div
+      style={{
+        position: 'relative',
+        zIndex: 2,
+        borderTop: '1px solid var(--bp-border)',
+        borderBottom: '1px solid var(--bp-border)',
+        padding: '14px 0',
+        overflow: 'hidden',
+        background: 'rgba(8,10,18,0.65)',
+        backdropFilter: 'blur(10px)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          gap: 60,
+          width: 'max-content',
+          animation: 'bpTicker 22s linear infinite',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {[...items, ...items].map((text, idx) => (
+          <div
+            key={idx}
+            className="bp-mono"
+            style={{
+              fontSize: 11,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              color: 'var(--bp-muted)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <span style={{ color: 'var(--bp-neon)' }}>✦</span> {text}
+            <span style={{ color: 'var(--bp-neon3)', marginLeft: 12 }}>◆</span>
+          </div>
+        ))}
+      </div>
+      <style jsx>{`
+        @keyframes bpTicker {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
+    </div>
+  );
 }

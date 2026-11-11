@@ -1,174 +1,175 @@
 'use client';
 
-import { css } from '../../../styled-system/css';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { apiUrl } from '@/lib/api';
+import { TIER_NAMES, TIER_PRICES } from '@/config/contracts';
+import { DiagnosticsFrame, PerformanceFrame } from '@/components/three/ProfileScenes';
 
-const myTickets = [
-    {
-        id: 1,
-        eventName: 'ALAS TRAIL RUN 2026',
-        category: '42K ULTRA MARATHON',
-        date: 'Aug 15, 2026',
-        status: 'Active',
-        tokenId: '#1088',
-        bg: 'linear-gradient(135deg, #0a2010 0%, #0f3d2e 100%)',
-        borderColor: 'neon',
-        btnText: 'View QR Code',
-        isActive: true,
-    },
-    {
-        id: 2,
-        eventName: 'RINJANI NATIONAL PARK',
-        category: 'SUMMIT EXPEDITION PASS',
-        date: 'Sep 10, 2026',
-        status: 'Upcoming',
-        tokenId: '#0422',
-        bg: 'linear-gradient(135deg, #2d0f1a 0%, #1a0f2e 100%)',
-        borderColor: 'neon3',
-        btnText: 'Transfer Ticket',
-        isActive: true,
-    },
-    {
-        id: 3,
-        eventName: 'GUNUNG SUMBING',
-        category: 'TEKTOK TRIP',
-        date: 'May 12, 2026',
-        status: 'Used / POAP',
-        tokenId: '#0055',
-        bg: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)',
-        borderColor: 'muted',
-        btnText: 'View on Explorer',
-        isActive: false,
-    },
-];
+type OwnedBalance = { tierId: number; name: string; balance: number };
 
 export default function ProfilePage() {
-    return (
-        <main className={css({ minHeight: '100vh', paddingTop: '100px', paddingBottom: '100px' })}>
-            <div className={css({ maxWidth: '1200px', margin: '0 auto', padding: '0 40px' })}>
+  const { address, isConnected } = useAccount();
+  const [balances, setBalances] = useState<OwnedBalance[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [tab, setTab] = useState(0);
 
-                {/* User Profile Header */}
-                <div className={css({
-                    background: 'surface',
-                    border: '1px solid token(colors.border)',
-                    padding: '40px',
-                    marginBottom: '40px',
-                    display: 'flex',
-                    flexDirection: { base: 'column', md: 'row' },
-                    alignItems: { base: 'flex-start', md: 'center' },
-                    justifyContent: 'space-between',
-                    gap: '24px'
-                })}>
-                    <div className={css({ display: 'flex', alignItems: 'center', gap: '24px' })}>
-                        <div className={css({
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, token(colors.neon), token(colors.neon2))',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontFamily: 'mono',
-                            fontSize: '24px',
-                            fontWeight: '800',
-                            color: 'bg'
-                        })}>
-                            0x
-                        </div>
-                        <div>
-                            <div className={css({ fontFamily: 'mono', fontSize: '11px', color: 'neon', letterSpacing: '0.2em', marginBottom: '8px' })}>
-                                CONNECTED WALLET
-                            </div>
-                            <h1 className={css({ fontSize: '28px', fontWeight: '800', fontFamily: 'mono' })}>
-                                0x4B2...9c1A
-                            </h1>
-                        </div>
-                    </div>
+  useEffect(() => {
+    if (!address) {
+      setBalances([]);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError('');
+    fetch(apiUrl(`/api/ticket?wallet=${address}`))
+      .then((r) => r.json())
+      .then((d) => {
+        if (cancelled) return;
+        if (d.success) setBalances(d.data.balances || []);
+        else setError(d.error || 'Gagal memuat tiket');
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [address]);
 
-                    <div className={css({ display: 'flex', gap: '32px' })}>
-                        <div>
-                            <div className={css({ fontFamily: 'mono', fontSize: '11px', color: 'muted', textTransform: 'uppercase', marginBottom: '4px' })}>Total Tickets</div>
-                            <div className={css({ fontSize: '24px', fontWeight: '800', color: 'text' })}>3</div>
-                        </div>
-                        <div>
-                            <div className={css({ fontFamily: 'mono', fontSize: '11px', color: 'muted', textTransform: 'uppercase', marginBottom: '4px' })}>Est. Value</div>
-                            <div className={css({ fontSize: '24px', fontWeight: '800', color: 'neon' })}>0.40 ETH</div>
-                        </div>
-                    </div>
+  const totalTickets = balances.reduce((s, b) => s + b.balance, 0);
+  const estValue = balances.reduce((s, b) => {
+    const price = Number(TIER_PRICES[b.tierId as keyof typeof TIER_PRICES] || 0);
+    return s + price * b.balance;
+  }, 0);
+  const short = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : '—';
+
+  return (
+    <main className="bp-page">
+      <div className="bp-bg-layer" aria-hidden>
+        <DiagnosticsFrame />
+      </div>
+      <div className="bp-content">
+        <Navbar />
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '110px 24px 40px' }}>
+          <div className="bp-glass" style={{ padding: 28, marginBottom: 28, display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+              <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, var(--bp-neon), var(--bp-neon2))', display: 'grid', placeItems: 'center', fontFamily: 'Space Mono, monospace', fontWeight: 800, color: '#04110d' }}>
+                0x
+              </div>
+              <div>
+                <div className="bp-mono" style={{ color: 'var(--bp-neon)', fontSize: 11, letterSpacing: '0.18em', marginBottom: 6 }}>
+                  {isConnected ? 'CONNECTED WALLET' : 'WALLET NOT CONNECTED'}
                 </div>
-
-                {/* Tabs */}
-                <div className={css({ display: 'flex', gap: '32px', borderBottom: '1px solid token(colors.border)', marginBottom: '40px' })}>
-                    {['Collected Tickets', 'Past Events (POAP)', 'Listed For Sale'].map((tab, idx) => (
-                        <button key={tab} className={css({
-                            background: 'transparent',
-                            border: 'none',
-                            padding: '0 0 16px 0',
-                            fontFamily: 'mono',
-                            fontSize: '13px',
-                            textTransform: 'uppercase',
-                            color: idx === 0 ? 'neon' : 'muted',
-                            borderBottom: idx === 0 ? '2px solid token(colors.neon)' : '2px solid transparent',
-                            cursor: 'pointer',
-                            transition: 'color 0.2s',
-                            _hover: { color: 'neon' }
-                        })}>
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Owned Tickets Grid */}
-                <div className={css({ display: 'grid', gridTemplateColumns: { base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: '24px' })}>
-                    {myTickets.map((ticket) => (
-                        <div key={ticket.id} className={css({
-                            background: 'card',
-                            border: '1px solid token(colors.border)',
-                            opacity: ticket.isActive ? 1 : 0.6,
-                            transition: 'transform 0.3s, border-color 0.3s',
-                            _hover: { transform: 'translateY(-4px)', borderColor: ticket.borderColor }
-                        })}>
-
-                            <div className={css({ height: '160px', padding: '20px', position: 'relative' })} style={{ background: ticket.bg }}>
-                                <span className={css({
-                                    position: 'absolute', top: '20px', right: '20px',
-                                    padding: '4px 8px', background: 'rgba(0,0,0,0.8)',
-                                    border: `1px solid token(colors.${ticket.borderColor})`,
-                                    color: `token(colors.${ticket.borderColor})`,
-                                    fontFamily: 'mono', fontSize: '9px', textTransform: 'uppercase'
-                                })}>
-                                    {ticket.status}
-                                </span>
-                                <div className={css({ position: 'absolute', bottom: '20px', left: '20px', fontFamily: 'mono', fontSize: '14px', fontWeight: '800', color: 'white' })}>
-                                    {ticket.tokenId}
-                                </div>
-                            </div>
-
-                            <div className={css({ padding: '24px' })}>
-                                <div className={css({ fontFamily: 'mono', fontSize: '10px', color: 'muted', letterSpacing: '0.1em', marginBottom: '8px' })}>
-                                    {ticket.category}
-                                </div>
-                                <h3 className={css({ fontSize: '18px', fontWeight: '700', marginBottom: '16px' })}>{ticket.eventName}</h3>
-
-                                <div className={css({ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'mono', fontSize: '11px', color: 'muted', marginBottom: '24px' })}>
-                                    <span>📅</span> {ticket.date}
-                                </div>
-
-                                <a href={ticket.isActive ? "/event" : "#"} className={css({
-                                    display: 'block', textAlign: 'center', width: '100%', padding: '12px',
-                                    background: 'transparent', color: ticket.isActive ? 'neon' : 'muted',
-                                    border: `1px solid ${ticket.isActive ? 'token(colors.neon)' : 'token(colors.border)'}`,
-                                    fontFamily: 'mono', fontSize: '11px', textTransform: 'uppercase', textDecoration: 'none',
-                                    transition: 'background 0.2s',
-                                    _hover: ticket.isActive ? { background: 'rgba(0,245,196,0.1)' } : {}
-                                })}>
-                                    {ticket.btnText}
-                                </a>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
+                <h1 className="bp-mono" style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>
+                  {short}
+                </h1>
+              </div>
             </div>
-        </main>
-    );
+            <div style={{ display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div>
+                <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)' }}>
+                  TOTAL TICKETS
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 800 }}>{totalTickets}</div>
+              </div>
+              <div>
+                <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)' }}>
+                  EST. VALUE
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--bp-neon)' }}>{estValue.toFixed(3)} ETH</div>
+              </div>
+              <ConnectButton />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 28, borderBottom: '1px solid var(--bp-border)', marginBottom: 28 }}>
+            {['Collected Tickets', 'Past Events (POAP)', 'Listed For Sale'].map((label, idx) => (
+              <button
+                key={label}
+                onClick={() => setTab(idx)}
+                className="bp-mono"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '0 0 14px',
+                  fontSize: 12,
+                  textTransform: 'uppercase',
+                  color: tab === idx ? 'var(--bp-neon)' : 'var(--bp-muted)',
+                  borderBottom: tab === idx ? '2px solid var(--bp-neon)' : '2px solid transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {!isConnected && (
+            <div className="bp-glass" style={{ padding: 40, textAlign: 'center' }}>
+              <PerformanceFrame />
+              <p className="bp-mono" style={{ color: 'var(--bp-muted)', marginTop: 18 }}>
+                Connect wallet to view your on-chain tickets.
+              </p>
+            </div>
+          )}
+
+          {isConnected && loading && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-neon)' }}>LOADING TICKETS…</p>}
+          {isConnected && error && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-neon3)' }}>{error}</p>}
+
+          {isConnected && !loading && tab === 0 && balances.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 48 }}>
+              <p className="bp-mono" style={{ color: 'var(--bp-muted)', marginBottom: 18 }}>
+                No tickets in this wallet yet.
+              </p>
+              <Link href="/marketplace" className="bp-btn bp-btn-solid">
+                Explore Marketplace
+              </Link>
+            </div>
+          )}
+
+          {isConnected && !loading && tab === 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
+              {balances.map((ticket) => (
+                <div key={ticket.tierId} className="bp-glass" style={{ overflow: 'hidden' }}>
+                  <div style={{ height: 140, padding: 18, position: 'relative', background: 'linear-gradient(135deg,#0a2010,#0f3d2e)' }}>
+                    <span className="bp-mono" style={{ position: 'absolute', top: 18, right: 18, border: '1px solid var(--bp-neon)', color: 'var(--bp-neon)', fontSize: 9, padding: '4px 8px' }}>
+                      Active
+                    </span>
+                    <div className="bp-mono" style={{ position: 'absolute', bottom: 18, left: 18, fontWeight: 800 }}>
+                      TIER #{ticket.tierId} × {ticket.balance}
+                    </div>
+                  </div>
+                  <div style={{ padding: 20 }}>
+                    <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)', marginBottom: 8 }}>
+                      {TIER_NAMES[ticket.tierId as keyof typeof TIER_NAMES] || ticket.name}
+                    </div>
+                    <h3 style={{ margin: '0 0 12px', fontSize: 18 }}>Blockpass Ticket</h3>
+                    <div className="bp-mono" style={{ fontSize: 11, color: 'var(--bp-muted)', marginBottom: 16 }}>
+                      {TIER_PRICES[ticket.tierId as keyof typeof TIER_PRICES] || '—'} ETH each
+                    </div>
+                    <Link href="/event/evt-web3-dev-connect" className="bp-btn" style={{ width: '100%' }}>
+                      View Event
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tab === 1 && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-muted)', padding: 48 }}>POAP history coming soon.</p>}
+          {tab === 2 && <p className="bp-mono" style={{ textAlign: 'center', color: 'var(--bp-muted)', padding: 48 }}>Secondary listings not active yet.</p>}
+        </div>
+        <Footer />
+      </div>
+    </main>
+  );
 }

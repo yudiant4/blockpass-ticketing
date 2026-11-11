@@ -24,15 +24,20 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
 
     mapping(uint256 => Tier) public tiers;
     mapping(address => mapping(uint256 => uint256)) public purchasedCount;
+    /// @dev Optional per-wallet cap per tier (0 = unlimited)
+    mapping(uint256 => uint256) public maxPerWallet;
     string private _baseURI;
 
     event TierConfigured(uint256 indexed tokenId, uint256 maxSupply, uint256 price);
     event PriceUpdated(uint256 indexed tierId, uint256 newPrice);
     event TicketMinted(address indexed buyer, uint256 indexed tokenId, uint256 amount, uint256 totalPrice);
+    event TicketCancelled(address indexed holder, uint256 indexed tokenId, uint256 amount);
     event FundsWithdrawn(address indexed admin, uint256 amount);
 
     constructor(string memory baseUri) ERC1155("") {
         _baseURI = baseUri;
+        // DEFAULT_ADMIN_ROLE is required so ADMIN/ORGANIZER can be granted/revoked later
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ADMIN_ROLE, msg.sender);
         _grantRole(ORGANIZER_ROLE, msg.sender);
     }
@@ -89,8 +94,17 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
     function configureTier(uint256 id, uint256 maxSupply, uint256 price) external onlyRole(ADMIN_ROLE) {
         require(id >= REGULAR_ID && id <= VVIP_ID, "Invalid tier");
         require(maxSupply > 0 && price > 0);
-        tiers[id] = Tier({maxSupply: maxSupply, currentSupply: 0, price: price, active: true});
+        // Preserve currentSupply so re-config does not wipe sold inventory
+        uint256 existing = tiers[id].currentSupply;
+        require(maxSupply >= existing, "maxSupply < currentSupply");
+        tiers[id] = Tier({maxSupply: maxSupply, currentSupply: existing, price: price, active: true});
         emit TierConfigured(id, maxSupply, price);
+    }
+
+    function setMaxPerWallet(uint256 id, uint256 maxAmount) external onlyRole(ADMIN_ROLE) {
+        require(id >= REGULAR_ID && id <= VVIP_ID, "Invalid tier");
+        require(tiers[id].active, "Tier not active");
+        maxPerWallet[id] = maxAmount;
     }
 
     /**
@@ -110,20 +124,47 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
     function mintTicket(uint256 id, uint256 amount) public payable whenNotPaused returns (uint256) {
         require(amount > 0 && tiers[id].active, "Invalid tier");
         require(tiers[id].currentSupply + amount <= tiers[id].maxSupply, "Insufficient supply");
+        uint256 cap = maxPerWallet[id];
+        if (cap > 0) {
+            require(purchasedCount[msg.sender][id] + amount <= cap, "Max per wallet exceeded");
+        }
         uint256 total = tiers[id].price * amount;
         require(msg.value >= total, "Insufficient payment");
         _mint(msg.sender, id, amount, "");
         tiers[id].currentSupply += amount;
         purchasedCount[msg.sender][id] += amount;
+        // Refund excess payment
+        if (msg.value > total) {
+            (bool refundOk,) = payable(msg.sender).call{value: msg.value - total}("");
+            require(refundOk, "Refund failed");
+        }
         emit TicketMinted(msg.sender, id, amount, total);
         return total;
     }
 
-    function cancelTicket(uint256 id, uint256 amount) external {
+    /**
+     * @dev Cancel tickets from a holder. Admin/organizer only.
+     * Burns from `holder` (not msg.sender) and refunds them at current tier price.
+     */
+    function cancelTicket(address holder, uint256 id, uint256 amount) external {
         require(hasRole(ADMIN_ROLE, msg.sender) || hasRole(ORGANIZER_ROLE, msg.sender), "Unauthorized");
-        require(tiers[id].active && balanceOf(msg.sender, id) >= amount);
-        _burn(msg.sender, id, amount);
+        require(holder != address(0), "Invalid holder");
+        require(amount > 0 && tiers[id].active, "Invalid tier");
+        require(balanceOf(holder, id) >= amount, "Insufficient balance");
+        uint256 refund = tiers[id].price * amount;
+        _burn(holder, id, amount);
         tiers[id].currentSupply -= amount;
+        if (purchasedCount[holder][id] >= amount) {
+            purchasedCount[holder][id] -= amount;
+        } else {
+            purchasedCount[holder][id] = 0;
+        }
+        if (refund > 0) {
+            require(address(this).balance >= refund, "Insufficient contract balance");
+            (bool ok,) = payable(holder).call{value: refund}("");
+            require(ok, "Refund failed");
+        }
+        emit TicketCancelled(holder, id, amount);
     }
 
     function withdraw() external onlyRole(ADMIN_ROLE) {

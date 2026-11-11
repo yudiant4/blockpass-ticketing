@@ -1,10 +1,14 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { css } from 'styled-system/css';
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
-import { FileText, Layers, AlertCircle } from 'lucide-react';
+import { AlertCircle, FileText, Layers } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { apiUrl } from '@/lib/api';
+import { GlassmorphismCta, NebulaBg, SceneFrame } from '@/components/three/ClientScenes';
 
 interface Tier {
   tierId: string;
@@ -18,9 +22,9 @@ interface Tier {
 
 export default function CreateEventPage() {
   const { address: adminWallet, isConnected } = useAccount();
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-
   const [form, setForm] = useState({
     title: '',
     category: 'Web3',
@@ -30,15 +34,14 @@ export default function CreateEventPage() {
     bannerUrl: '',
     description: '',
   });
-
   const [tiers, setTiers] = useState<Tier[]>([
     { tierId: 'tier-regular', tierName: 'Regular', price: 0.001, quota: 100, maxPerWallet: 2, perks: [], customFields: [] },
   ]);
 
   const totalQuota = useMemo(() => tiers.reduce((s, t) => s + t.quota, 0), [tiers]);
   const priceRange = useMemo(() => {
-    if (tiers.length === 0) return { min: 0, max: 0 };
-    const prices = tiers.map(t => t.price);
+    if (!tiers.length) return { min: 0, max: 0 };
+    const prices = tiers.map((t) => t.price);
     return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [tiers]);
 
@@ -47,27 +50,19 @@ export default function CreateEventPage() {
     if (!form.title || !form.startDate || !form.endDate || !form.location) return false;
     if (tiers.length < 1) return false;
     if (new Date(form.startDate) <= new Date()) return false;
-    return tiers.every(t => t.price >= 0 && t.quota >= 1 && t.maxPerWallet >= 1);
+    return tiers.every((t) => t.price >= 0 && t.quota >= 1 && t.maxPerWallet >= 1);
   }, [form, tiers, adminWallet]);
 
   const addTier = () => {
-    setTiers(prev => [...prev, {
-      tierId: `tier-${Date.now()}`,
-      tierName: '',
-      price: 0,
-      quota: 1,
-      maxPerWallet: 2,
-      perks: [],
-      customFields: [],
-    }]);
+    setTiers((prev) => [
+      ...prev,
+      { tierId: `tier-${Date.now()}`, tierName: '', price: 0, quota: 1, maxPerWallet: 2, perks: [], customFields: [] },
+    ]);
   };
 
-  const removeTier = (index: number) => {
-    setTiers(prev => prev.filter((_, i) => i !== index));
-  };
-
+  const removeTier = (index: number) => setTiers((prev) => prev.filter((_, i) => i !== index));
   const updateTier = (index: number, field: keyof Tier, value: any) => {
-    setTiers(prev => prev.map((t, i) => i === index ? { ...t, [field]: value } : t));
+    setTiers((prev) => prev.map((t, i) => (i === index ? { ...t, [field]: value } : t)));
   };
 
   const handleSubmit = async () => {
@@ -75,12 +70,9 @@ export default function CreateEventPage() {
     setSubmitting(true);
     setMessage('');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://129.226.95.94:3002'}/api/events`, {
+      const res = await fetch(apiUrl('/api/events'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-wallet': adminWallet,
-        },
+        headers: { 'Content-Type': 'application/json', 'x-admin-wallet': adminWallet },
         body: JSON.stringify({
           title: form.title,
           slug: form.title.toLowerCase().replace(/\s+/g, '-'),
@@ -96,8 +88,10 @@ export default function CreateEventPage() {
       const data = await res.json();
       if (data.status === 'success') {
         setMessage('Event created successfully');
+        const id = data.data?._id;
+        if (id) setTimeout(() => router.push(`/event/${id}`), 800);
       } else {
-        setMessage(data.message);
+        setMessage(data.message || 'Gagal membuat event');
       }
     } catch (e: any) {
       setMessage(e.message);
@@ -106,43 +100,22 @@ export default function CreateEventPage() {
     }
   };
 
-  // Wallet Access Gate
   if (!isConnected) {
     return (
-      <main className={css({ minHeight: '100vh', bg: 'gray.900', py: '24', px: '4', display: 'flex', alignItems: 'center', justifyContent: 'center' })}>
-        <div className={css({
-          bg: 'rgba(255,255,255,0.02)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          rounded: 'lg',
-          p: '8',
-          textAlign: 'center',
-          maxW: 'md',
-        })}>
-          <div className={css({
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '2',
-            mb: '4',
-          })}>
-            <AlertCircle size={20} color="#06b6d4" />
-            <span className={css({
-              fontFamily: 'mono',
-              textTransform: 'uppercase',
-              letterSpacing: '0.15em',
-              color: 'emerald.400',
-              fontSize: 'xs',
-              fontWeight: 'bold',
-            })}>ACCESS RESTRICTED</span>
+      <main className="bp-page" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24 }}>
+        <div className="bp-bg-layer" aria-hidden>
+          <NebulaBg mode="dark" />
+        </div>
+        <Navbar />
+        <div className="bp-glass bp-content" style={{ maxWidth: 420, padding: 28, textAlign: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+            <AlertCircle size={18} color="var(--bp-neon)" />
+            <span className="bp-mono" style={{ color: 'var(--bp-neon)', fontSize: 11, letterSpacing: '0.16em' }}>
+              ACCESS RESTRICTED
+            </span>
           </div>
-          <h1 className={css({
-            fontSize: '2xl',
-            fontWeight: 'bold',
-            color: 'white',
-            mb: '2',
-          })}>CONNECT WALLET TO CREATE EVENT</h1>
-          <p className={css({ color: 'muted', mb: '6' })}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 10 }}>CONNECT WALLET TO CREATE EVENT</h1>
+          <p style={{ color: 'var(--bp-muted)', marginBottom: 20 }}>
             You must connect your Web3 wallet before accessing the event builder interface.
           </p>
           <ConnectButton />
@@ -152,194 +125,141 @@ export default function CreateEventPage() {
   }
 
   return (
-    <main className={css({ minHeight: '100vh', bg: 'gray.900', py: '24', px: '4' })}>
-      <div className={css({ maxW: '4xl', mx: 'auto' })}>
-        <h1 className={css({ fontSize: '3xl', fontWeight: 'bold', color: 'white', mb: '6' })}>CREATE NEW EVENT</h1>
+    <main className="bp-page">
+      <div className="bp-bg-layer" aria-hidden>
+        <NebulaBg mode="dark" hue={0.7} />
+      </div>
+      <div className="bp-content">
+        <Navbar />
+        <div style={{ maxWidth: 880, margin: '0 auto', padding: '110px 24px 40px' }}>
+          <h1 style={{ fontSize: 34, fontWeight: 800, marginBottom: 22 }}>CREATE NEW EVENT</h1>
 
-        <section className={css({
-          bg: 'rgba(255,255,255,0.02)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          rounded: 'lg',
-          p: '6',
-          mb: '8',
-        })}>
-          <div className={css({ display: 'flex', alignItems: 'center', mb: '4' })}>
-            <div className={css({ w: '2', h: '8', bg: 'neon', mr: '3' })} />
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '2', color: 'neon' })}>
-              <FileText size={20} />
-              <span className={css({ fontSize: 'lg', fontWeight: '600' })}>General Information</span>
+          <SceneFrame height={160} style={{ marginBottom: 22 }}>
+            <GlassmorphismCta mode="dark" hue={0.5} />
+          </SceneFrame>
+
+          <section className="bp-glass" style={{ padding: 24, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--bp-neon)', marginBottom: 16 }}>
+              <FileText size={18} />
+              <span style={{ fontWeight: 600 }}>General Information</span>
             </div>
-          </div>
-          <div className={css({ gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
-            <label className={css({ display: 'block' })}>
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>TITLE<span className={css({ color: 'neon' })}>*</span></span>
-              <input type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                className={css({ w: 'full', mt: '1', bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-              />
-            </label>
-
-            <label className={css({ display: 'block' })}>
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>CATEGORY<span className={css({ color: 'neon' })}>*</span></span>
-              <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                className={css({ w: 'full', mt: '1', bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white', cursor: 'pointer' })}
-              >
-                <option value="Web3">WEB3</option>
-                <option value="Sports/Race">SPORTS</option>
-                <option value="Music">MUSIC</option>
-                <option value="Conference">CONFERENCE</option>
-              </select>
-            </label>
-
-            <label className={css({ display: 'block' })}>
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>START DATE<span className={css({ color: 'neon' })}>*</span></span>
-              <input type="datetime-local" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
-                className={css({ w: 'full', mt: '1', bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-              />
-            </label>
-
-            <label className={css({ display: 'block' })}>
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>END DATE<span className={css({ color: 'neon' })}>*</span></span>
-              <input type="datetime-local" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
-                className={css({ w: 'full', mt: '1', bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-              />
-            </label>
-
-            <label className={css({ display: 'block' })}>
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>LOCATION<span className={css({ color: 'neon' })}>*</span></span>
-              <input type="text" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
-                className={css({ w: 'full', mt: '1', bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-              />
-            </label>
-
-            <label className={css({ display: 'block' })}>
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>BANNER URL</span>
-              <input type="text" value={form.bannerUrl} onChange={e => setForm(f => ({ ...f, bannerUrl: e.target.value }))}
-                className={css({ w: 'full', mt: '1', bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-              />
-            </label>
-
-            <label className={css({ display: 'block', gridColumn: 'span 2' })}>
-              <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>DESCRIPTION</span>
-              <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                className={css({ w: 'full', mt: '1', bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white', minH: '120px' })}
-              />
-            </label>
-          </div>
-        </section>
-
-        <section className={css({
-          bg: 'rgba(255,255,255,0.02)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          rounded: 'lg',
-          p: '6',
-          mb: '8',
-        })}>
-          <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '4' })}>
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '2', color: 'neon' })}>
-              <Layers size={20} />
-              <span className={css({ fontSize: 'lg', fontWeight: '600' })}>Ticket Tiers</span>
+            <div className="bp-grid-2">
+              <label>
+                <span className="bp-label">Title *</span>
+                <input className="bp-input" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
+              </label>
+              <label>
+                <span className="bp-label">Category *</span>
+                <select className="bp-select" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}>
+                  <option value="Web3">WEB3</option>
+                  <option value="Sports/Race">SPORTS</option>
+                  <option value="Music">MUSIC</option>
+                  <option value="Conference">CONFERENCE</option>
+                </select>
+              </label>
+              <label>
+                <span className="bp-label">Start Date *</span>
+                <input className="bp-input" type="datetime-local" value={form.startDate} onChange={(e) => setForm((f) => ({ ...f, startDate: e.target.value }))} />
+              </label>
+              <label>
+                <span className="bp-label">End Date *</span>
+                <input className="bp-input" type="datetime-local" value={form.endDate} onChange={(e) => setForm((f) => ({ ...f, endDate: e.target.value }))} />
+              </label>
+              <label>
+                <span className="bp-label">Location *</span>
+                <input className="bp-input" value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} />
+              </label>
+              <label>
+                <span className="bp-label">Banner URL</span>
+                <input className="bp-input" value={form.bannerUrl} onChange={(e) => setForm((f) => ({ ...f, bannerUrl: e.target.value }))} />
+              </label>
+              <label style={{ gridColumn: '1 / -1' }}>
+                <span className="bp-label">Description</span>
+                <textarea className="bp-textarea" rows={4} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+              </label>
             </div>
-            <button onClick={addTier} className={css({ bg: 'neon', color: 'black', px: '3', py: '1', rounded: 'md', fontSize: 'sm', fontWeight: 'bold', cursor: 'pointer' })}>ADD TIER</button>
-          </div>
+          </section>
 
-          {tiers.map((tier, i) => (
-            <div key={tier.tierId} className={css({ bg: 'gray.800', border: '1px solid gray.700', rounded: 'md', p: '4', mb: '4' })}>
-              <div className={css({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '2' })}>
-                <span className={css({ fontFamily: 'mono', textXs: true, color: 'gray.400' })}>TIER {i + 1}</span>
-                {tiers.length > 1 && (
-                  <button onClick={() => removeTier(i)} className={css({ color: 'red.400', fontSize: 'sm', cursor: 'pointer', fontFamily: 'mono' })}>REMOVE</button>
-                )}
+          <section className="bp-glass" style={{ padding: 24, marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--bp-neon)' }}>
+                <Layers size={18} />
+                <span style={{ fontWeight: 600 }}>Ticket Tiers</span>
               </div>
-              <div className={css({ gap: '3', gridTemplateColumns: { base: '1fr', md: 'repeat(2,1fr)' } })}>
-                <label className={css({ display: 'block' })}>
-                  <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>TIER NAME<span className={css({ color: 'neon' })}>*</span></span>
-                  <input type="text" value={tier.tierName} onChange={e => updateTier(i, 'tierName', e.target.value)}
-                    className={css({ w: 'full', mt: '1', bg: 'gray.900', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-                  />
-                </label>
-                <label className={css({ display: 'block' })}>
-                  <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>PRICE (ETH)<span className={css({ color: 'neon' })}>*</span></span>
-                  <input type="number" step="0.001" min="0" value={tier.price} onChange={e => updateTier(i, 'price', parseFloat(e.target.value) || 0)}
-                    className={css({ w: 'full', mt: '1', bg: 'gray.900', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-                  />
-                </label>
-                <label className={css({ display: 'block' })}>
-                  <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>QUOTA<span className={css({ color: 'neon' })}>*</span></span>
-                  <input type="number" min="1" value={tier.quota} onChange={e => updateTier(i, 'quota', parseInt(e.target.value) || 1)}
-                    className={css({ w: 'full', mt: '1', bg: 'gray.900', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-                  />
-                </label>
-                <label className={css({ display: 'block' })}>
-                  <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>MAX PER WALLET<span className={css({ color: 'neon' })}>*</span></span>
-                  <input type="number" min="1" value={tier.maxPerWallet} onChange={e => updateTier(i, 'maxPerWallet', parseInt(e.target.value) || 1)}
-                    className={css({ w: 'full', mt: '1', bg: 'gray.900', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-                  />
-                </label>
-                <label className={css({ display: 'block' })}>
-                  <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>PERKS</span>
-                  <input type="text" value={tier.perks.join(', ')} onChange={e => updateTier(i, 'perks', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                    className={css({ w: 'full', mt: '1', bg: 'gray.900', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-                  />
-                </label>
-                <label className={css({ display: 'block' })}>
-                  <span className={css({ fontFamily: 'mono', fontSize: 'xs', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'gray.400' })}>CUSTOM FIELDS</span>
-                  <input type="text" value={tier.customFields.join(', ')} onChange={e => updateTier(i, 'customFields', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                    className={css({ w: 'full', mt: '1', bg: 'gray.900', border: '1px solid gray.700', rounded: 'md', p: '2', color: 'white' })}
-                  />
-                </label>
+              <button className="bp-btn bp-btn-solid" onClick={addTier}>
+                ADD TIER
+              </button>
+            </div>
+            {tiers.map((tier, i) => (
+              <div key={tier.tierId} className="bp-glass" style={{ padding: 16, marginBottom: 12, background: 'rgba(0,0,0,0.25)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span className="bp-mono" style={{ fontSize: 11, color: 'var(--bp-muted)' }}>
+                    TIER {i + 1}
+                  </span>
+                  {tiers.length > 1 && (
+                    <button className="bp-mono" style={{ background: 'none', border: 'none', color: 'var(--bp-neon3)', cursor: 'pointer' }} onClick={() => removeTier(i)}>
+                      REMOVE
+                    </button>
+                  )}
+                </div>
+                <div className="bp-grid-2">
+                  <label>
+                    <span className="bp-label">Tier Name *</span>
+                    <input className="bp-input" value={tier.tierName} onChange={(e) => updateTier(i, 'tierName', e.target.value)} />
+                  </label>
+                  <label>
+                    <span className="bp-label">Price (ETH) *</span>
+                    <input className="bp-input" type="number" step="0.001" min="0" value={tier.price} onChange={(e) => updateTier(i, 'price', parseFloat(e.target.value) || 0)} />
+                  </label>
+                  <label>
+                    <span className="bp-label">Quota *</span>
+                    <input className="bp-input" type="number" min="1" value={tier.quota} onChange={(e) => updateTier(i, 'quota', parseInt(e.target.value) || 1)} />
+                  </label>
+                  <label>
+                    <span className="bp-label">Max Per Wallet *</span>
+                    <input className="bp-input" type="number" min="1" value={tier.maxPerWallet} onChange={(e) => updateTier(i, 'maxPerWallet', parseInt(e.target.value) || 1)} />
+                  </label>
+                </div>
+              </div>
+            ))}
+          </section>
+
+          <section className="bp-glass" style={{ padding: 24, marginBottom: 20 }}>
+            <div className="bp-grid-3">
+              <div style={{ textAlign: 'center', padding: 12 }}>
+                <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)' }}>
+                  TOTAL QUOTA
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--bp-neon)' }}>{totalQuota}</div>
+              </div>
+              <div style={{ textAlign: 'center', padding: 12 }}>
+                <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)' }}>
+                  PRICE RANGE
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--bp-neon)' }}>
+                  {priceRange.min} - {priceRange.max} ETH
+                </div>
+              </div>
+              <div style={{ textAlign: 'center', padding: 12 }}>
+                <div className="bp-mono" style={{ fontSize: 10, color: 'var(--bp-muted)' }}>
+                  TOTAL TIERS
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--bp-neon)' }}>{tiers.length}</div>
               </div>
             </div>
-          ))}
-        </section>
+          </section>
 
-        <section className={css({
-          bg: 'rgba(255,255,255,0.02)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          rounded: 'lg',
-          p: '6',
-          mb: '8',
-        })}>
-          <div className={css({ display: 'flex', alignItems: 'center', mb: '4' })}>
-            <div className={css({ w: '2', h: '8', bg: 'neon', mr: '3' })} />
-            <div className={css({ display: 'flex', alignItems: 'center', gap: '2', color: 'neon' })}>
-              <Layers size={20} />
-              <span className={css({ fontSize: 'lg', fontWeight: '600' })}>Summary</span>
+          {message && (
+            <div className="bp-glass" style={{ padding: 12, marginBottom: 16, color: message.includes('success') ? 'var(--bp-neon)' : 'var(--bp-neon3)' }}>
+              {message}
             </div>
-          </div>
-          <div className={css({ gap: '4', gridTemplateColumns: { base: '1fr', md: 'repeat(3,1fr)' } })}>
-            <div className={css({ textAlign: 'center', p: '3', bg: 'gray.800', rounded: 'md' })}>
-              <p className={css({ fontFamily: 'mono', textXs: true, color: 'gray.400', textTransform: 'uppercase' })}>TOTAL QUOTA</p>
-              <p className={css({ fontSize: '2xl', fontWeight: 'bold', color: 'neon' })}>{totalQuota}</p>
-            </div>
-            <div className={css({ textAlign: 'center', p: '3', bg: 'gray.800', rounded: 'md' })}>
-              <p className={css({ fontFamily: 'mono', textXs: true, color: 'gray.400', textTransform: 'uppercase' })}>PRICE RANGE</p>
-              <p className={css({ fontSize: '2xl', fontWeight: 'bold', color: 'neon' })}>{priceRange.min} - {priceRange.max} ETH</p>
-            </div>
-            <div className={css({ textAlign: 'center', p: '3', bg: 'gray.800', rounded: 'md' })}>
-              <p className={css({ fontFamily: 'mono', textXs: true, color: 'gray.400', textTransform: 'uppercase' })}>TOTAL TIERS</p>
-              <p className={css({ fontSize: '2xl', fontWeight: 'bold', color: 'neon' })}>{tiers.length}</p>
-            </div>
-          </div>
-        </section>
+          )}
 
-        {message && (
-          <div className={css({ p: '3', mb: '6', bg: message.includes('success') ? 'emerald.700' : 'red.700', rounded: 'md', color: 'white', fontWeight: 'medium', fontFamily: 'mono' })}>
-            {message}
-          </div>
-        )}
-
-        <button onClick={handleSubmit} disabled={!canSubmit || submitting}
-          className={css({
-            w: 'full', py: '3', rounded: 'lg',
-            bg: canSubmit && !submitting ? 'neon' : 'gray.700',
-            color: 'black', fontWeight: 'bold', cursor: 'pointer',
-            fontFamily: 'mono',
-          })}>
-          {submitting ? 'CREATING...' : 'CREATE EVENT'}
-        </button>
+          <button className={`bp-btn ${canSubmit && !submitting ? 'bp-btn-solid' : ''}`} style={{ width: '100%', padding: 16 }} disabled={!canSubmit || submitting} onClick={handleSubmit}>
+            {submitting ? 'CREATING...' : 'CREATE EVENT'}
+          </button>
+        </div>
+        <Footer />
       </div>
     </main>
   );

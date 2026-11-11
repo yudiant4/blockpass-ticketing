@@ -1,9 +1,11 @@
 # Blockpass Ticketing — Final Audit Report (Updated)
 
-**Contract:** `BlockpassTicket.sol` (Solidity ^0.8.20)
+**Contract:** `BlockpassTicket.sol` (Solidity ^0.8.20) — **ERC-1155 tier minting** (not ERC-721 event registry)
 **Tech Stack:** Next.js 14, Wagmi, RainbowKit, Viem, OpenZeppelin
 **Audit Date:** 2026-08-19
 **Auditor:** Hermes Agent
+
+> **Note (2026-11-11):** Sample snippets below (Event struct, `useTicket`, ERC-721 cancel) describe an older design. The live contract is ERC-1155 with `configureTier` / `mintTicket` / `cancelTicket(holder,id,amount)` + excess refund. Prefer `forge test` and `contracts/BlockpassTicket.sol` as source of truth.
 
 ---
 

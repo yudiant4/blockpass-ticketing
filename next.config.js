@@ -2,21 +2,25 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['@designcodeio/threeui', 'three'],
   async rewrites() {
-    return [{
-      source: '/api/:path*',
-      destination: 'http://129.226.95.94:3002/api/:path*',
-    }];
+    const backend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL;
+    if (!backend) return [];
+    const destination = backend.replace(/\/$/, '');
+    return [
+      {
+        source: '/backend-api/:path*',
+        destination: `${destination}/api/:path*`,
+      },
+    ];
   },
   webpack: (config, { isServer }) => {
-    // Aliases
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './src'),
       'styled-system': path.resolve(__dirname, './styled-system'),
     };
 
-    // Client-side fallback for Node core modules used by MetaMask SDK
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
