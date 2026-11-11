@@ -140,9 +140,11 @@ contract BlockpassTicket1155Test is Test {
 
     function test_DefaultAdminCanGrant() public {
         address newAdmin = makeAddr("newAdmin");
+        bytes32 adminRole = ticket.ADMIN_ROLE();
+        // vm.prank lasts one call — read role id before pranking grantRole
         vm.prank(admin);
-        ticket.grantRole(ticket.ADMIN_ROLE(), newAdmin);
-        assertTrue(ticket.hasRole(ticket.ADMIN_ROLE(), newAdmin));
+        ticket.grantRole(adminRole, newAdmin);
+        assertTrue(ticket.hasRole(adminRole, newAdmin));
     }
 
     receive() external payable {}
