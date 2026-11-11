@@ -125,5 +125,25 @@ contract BlockpassTicket1155Test is Test {
         ticket.cancelTicket(buyer, 1, 1);
     }
 
+    function test_MaxPerWallet() public {
+        vm.prank(admin);
+        ticket.setMaxPerWallet(1, 1);
+
+        vm.deal(buyer, 1 ether);
+        vm.prank(buyer);
+        ticket.mintTicket{value: 0.001 ether}(1, 1);
+
+        vm.prank(buyer);
+        vm.expectRevert("Max per wallet exceeded");
+        ticket.mintTicket{value: 0.001 ether}(1, 1);
+    }
+
+    function test_DefaultAdminCanGrant() public {
+        address newAdmin = makeAddr("newAdmin");
+        vm.prank(admin);
+        ticket.grantRole(ticket.ADMIN_ROLE(), newAdmin);
+        assertTrue(ticket.hasRole(ticket.ADMIN_ROLE(), newAdmin));
+    }
+
     receive() external payable {}
 }

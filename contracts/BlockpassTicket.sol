@@ -24,6 +24,8 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
 
     mapping(uint256 => Tier) public tiers;
     mapping(address => mapping(uint256 => uint256)) public purchasedCount;
+    /// @dev Optional per-wallet cap per tier (0 = unlimited)
+    mapping(uint256 => uint256) public maxPerWallet;
     string private _baseURI;
 
     event TierConfigured(uint256 indexed tokenId, uint256 maxSupply, uint256 price);
@@ -34,6 +36,8 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
 
     constructor(string memory baseUri) ERC1155("") {
         _baseURI = baseUri;
+        // DEFAULT_ADMIN_ROLE is required so ADMIN/ORGANIZER can be granted/revoked later
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ADMIN_ROLE, msg.sender);
         _grantRole(ORGANIZER_ROLE, msg.sender);
     }
@@ -97,6 +101,12 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
         emit TierConfigured(id, maxSupply, price);
     }
 
+    function setMaxPerWallet(uint256 id, uint256 maxAmount) external onlyRole(ADMIN_ROLE) {
+        require(id >= REGULAR_ID && id <= VVIP_ID, "Invalid tier");
+        require(tiers[id].active, "Tier not active");
+        maxPerWallet[id] = maxAmount;
+    }
+
     /**
      * @dev Update price for an existing tier (only ADMIN_ROLE)
      * @param id Tier ID (1=REGULAR, 2=VIP, 3=VVIP)
@@ -114,6 +124,10 @@ contract BlockpassTicket is ERC1155, AccessControl, Pausable {
     function mintTicket(uint256 id, uint256 amount) public payable whenNotPaused returns (uint256) {
         require(amount > 0 && tiers[id].active, "Invalid tier");
         require(tiers[id].currentSupply + amount <= tiers[id].maxSupply, "Insufficient supply");
+        uint256 cap = maxPerWallet[id];
+        if (cap > 0) {
+            require(purchasedCount[msg.sender][id] + amount <= cap, "Max per wallet exceeded");
+        }
         uint256 total = tiers[id].price * amount;
         require(msg.value >= total, "Insufficient payment");
         _mint(msg.sender, id, amount, "");
