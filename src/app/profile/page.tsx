@@ -181,7 +181,7 @@ export default function ProfilePage() {
 
         {!isConnected && (
           <div className={css({ textAlign: 'center', padding: '60px 20px', fontFamily: 'mono', color: 'muted' })}>
-            Connect wallet untuk melihat tiket on-chain Anda.
+            Connect wallet to view your on-chain tickets.
           </div>
         )}
 
